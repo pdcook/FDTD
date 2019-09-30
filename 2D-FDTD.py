@@ -122,6 +122,7 @@ class Pulse:
         The Pulse class defines a pulse to set as the electric flux in the simulation.
         It creates a 2D gaussian pulse in both time and space
         It is definted by:
+            center          - where the pulse will be centered in space, (x0,y0)
             radial_center   - where the pulse will peak radially from the center
                                 for example:
                                 radial_center = 0:          radial_center > 0:
@@ -140,17 +141,18 @@ class Pulse:
             temporal_spread - the standard deviation of the gaussian in time
 
     """
-    def __init__(self, media, radial_center, spacial_spread, temporal_center, temporal_spread):
+    def __init__(self, media, center, radial_center, spacial_spread, temporal_center, temporal_spread):
 
         self.temporal_center = temporal_center
         self.temporal_spread = temporal_spread
 
         Ny, Nx = media.shape
         dx     = media.dx
+        x0, y0 = center
 
         x, y    = np.meshgrid(np.linspace(-Nx/2,Nx/2,Nx)*dx, np.linspace(-Ny/2,Ny/2,Ny)*dx)
-        d       = np.sqrt(x*x+y*y)
-        self.g_space = np.exp(-( (d-radial_center)**2 / ( 2.0 * spacial_spread**2 ) ) )
+        d       = np.sqrt((x-x0)**2+(y-y0)**2)
+        self.g_space = np.exp(-( (( d - radial_center )**2) / ( 2.0 * spacial_spread**2 ) ) )
 
     def getPulse(self, times):
         """
@@ -160,6 +162,7 @@ class Pulse:
         g_time = np.exp(-(times-self.temporal_center)**2 / (2 * self.temporal_spread**2) )
 
         return (g_time*(self.g_space*np.ones((g_time.size,self.g_space.shape[0],self.g_space.shape[1]))).T).T
+
 
 def Animate(F):
     """
@@ -187,7 +190,7 @@ def Animate(F):
 ################################################################################
 
 media = Media(200,200,0.1)
-pulse = Pulse(media, 30*media.dx, 10*media.dx, 10*media.dt, 2*media.dt)
+pulse = Pulse(media, (0,-25*media.dx), 30*media.dx, 10*media.dx, 10*media.dt, 2*media.dt)
 Ez, Dz, Hx, Hy = FDTD2D(media, pulse, 200)
 Animate(Ez)
 
