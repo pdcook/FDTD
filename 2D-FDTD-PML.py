@@ -4,6 +4,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 
 c  = 3E8      # speed of light in meters per second^2
@@ -201,7 +202,7 @@ class Pulse:
 
         return (g_time*(self.g_space*np.ones((g_time.size,self.g_space.shape[0],self.g_space.shape[1]))).T).T
 
-def Animate(F,excludePML = 0):
+def Animate(F, excludePML = 0, cmin = None, cmax = None):
     """
         Animate will animate the propagation of a given field
     """
@@ -210,26 +211,23 @@ def Animate(F,excludePML = 0):
 
     Nt, Ny, Nx = F.shape
 
-    X = np.arange(Nx)
-    Y = np.arange(Ny)
+    fig, ax = plt.subplots(1,1)
 
-    X,Y = np.meshgrid(X,Y)
+    if cmin is None: cmin = np.min(F)/3
+    if cmax is None: cmax = np.max(F)/3
+    im = ax.imshow(F[0], animated=True, clim=(cmin,cmax))
 
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.set_zlim(-5,5)
+    def updatefig(ti):
+        ti %= Nt
+        im.set_array(F[ti])
+        return [im]
 
-    for ti in range(Nt):
-        if ti > 0:
-            plot.remove()
-        plot = ax.plot_surface(X,Y,F[ti],cmap="viridis")
-        plt.draw()
-        plt.pause(0.001)
+    ani = animation.FuncAnimation(fig, updatefig, interval=5, blit=True)
+    plt.show()
 
 ################################################################################
 
-media = Media(100,100,0.1)
+media = Media(200,200,0.1)
 pulse = Pulse(media, (0*media.dx,-25*media.dx), 10*media.dx, 10*media.dx, 10*media.dt, 2*media.dt)
 Ez, Dz, Hx, Hy = FDTD2D(media, pulse, 200, PMLSize = 10)
 Animate(Ez)
-
