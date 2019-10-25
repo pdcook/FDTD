@@ -225,9 +225,17 @@ def Animate(F, excludePML = 0, cmin = None, cmax = None):
     ani = animation.FuncAnimation(fig, updatefig, interval=5, blit=True)
     plt.show()
 
+def Energy(Ez,Hx,Hy):
+    Nt, Ny, Nx = Ez.shape
+    E_Ez = np.sum(Ez**2, axis=(1,2))
+    E_Hx = np.sum(Hx**2, axis=(1,2))
+    E_Hy = np.sum(Hy**2, axis=(1,2))
+    return E_Ez+E_Hx+E_Hy
+
 ################################################################################
 
 media = Media(200,200,0.1)
 pulse = Pulse(media, (0*media.dx,-25*media.dx), 10*media.dx, 10*media.dx, 10*media.dt, 2*media.dt)
 Ez, Dz, Hx, Hy = FDTD2D(media, pulse, 200, PMLSize = 10)
+E = Energy(Ez,Hx,Hy)
 Animate(Ez)
