@@ -1,0 +1,207 @@
+\documentclass[12pt,twocolumn]{article}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{setspace}
+\usepackage{tocloft}
+\usepackage[scaled]{beramono}
+\usepackage[T1]{fontenc}
+\usepackage{cite}
+\usepackage{authblk}
+\usepackage[toc,page]{appendix} % for appendices
+\usepackage{gensymb}            % for degree symbol
+\usepackage[pdftex]{graphicx}   % for figures
+\usepackage{siunitx}            % for si units
+\usepackage[caption=false]{subfig}  % for subfigures
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{titling}
+\usepackage{hyperref}
+\usepackage{epstopdf}
+\usepackage{esint}
+\usepackage{physics}
+\hypersetup{
+    colorlinks=true,
+    urlcolor=blue,
+    linkcolor=blue,
+    citecolor=red}
+\providecommand{\keywords}[1]{\textbf{\textbf{Keywords:~}} #1}
+\captionsetup[subfigure]{labelformat=brace} % setup subfigure captions
+\graphicspath{{./Figures/}}     % figures in the Figures directory
+\DeclareGraphicsExtensions{.eps,.ps,.pdf}    % extensions for figures
+\newcommand{\comment}[1]{}      % command for multiline comments
+
+\renewcommand{\cftdotsep}{\cftnodots}
+\cftpagenumbersoff{figure}
+\cftpagenumbersoff{table}
+\begin{document}
+\title{A Finite Difference Time Domain Method for Two Dimensional Electromagnetic Wave Propagation In Lossy Dielectric Media With Cyclic and Perfectly Matched Layer Boundary Conditions}
+\author{Patrick D. Cook}
+\affil{Department~of~Physics,~Fort~Hays~State~University,\\Hays,~Kansas~67601,~USA}
+\date{Fall 2019}
+\begin{titlingpage}
+\maketitle
+\begin{abstract}
+In this work, the foundations behind the one- and two-dimensional finite-difference time-domain (FDTD) method in the context of electromagnetic wave propagation are presented. Two different boundary conditions, cyclic and perfectly matched layer (PML), are presented and discussed. This work includes implementations of the method using both boundary conditions, written in standard Python 3.
+\end{abstract}
+
+\keywords{Electromagnetic wave simulation, finite-difference time-domain, perfectly matched layer}
+\end{titlingpage}
+\newpage
+\section{Introduction}
+The goal of the finite-difference time-domain (FDTD) method is to simulate the propagation of electromagnetic waves in complex geometry. For instance, propagation through several different materials with different dielectric constants, or electrical conductivities. Problems such as these are often impossible to solve analytically, and so numerical approaches, such as this one, are required.
+
+This work is an overview of the derivation of the necessary expressions used in the FDTD method as well as two types of boundary conditions. Implementations of the method for both boundary conditions with results are presented and discussed.
+\section{Maxwell's Equations for Electromagnetic Waves}
+The differiential form of Maxwell's equations for the electric field, $\mathbf{E}$, and magnetic field, $\mathbf{B}$, in vacuum, are~\cite{Jackson99}
+\begin{align}
+\div{\mathbf{E}} &= \frac{\rho}{\epsilon_0}, \\
+\div{\mathbf{B}} &= 0, \\
+\label{eq:curl_E}\curl{\mathbf{E}}&= -\frac{\partial\mathbf{B}}{\partial t}, \\
+\label{eq:curl_B}\curl{\mathbf{B}}&= \mu_0\mathbf{J}+\frac{1}{c^2}\frac{\partial\mathbf{E}}{\partial t}.
+\end{align}
+Where
+\begin{itemize}
+\item $\rho$ is the free electric charge density
+\item $\mathbf{J}$ is the free current density
+\item $\epsilon_0$ is the permittivity of free space
+\item $\mu_0$ is the permeability of free space
+\item $c$ is the speed of light, $c\equiv\frac{1}{\sqrt{\epsilon_0\mu_0}}$
+\end{itemize}
+In the context of electromagnetic wave propagation, only Eqs.~\ref{eq:curl_E}~and~\ref{eq:curl_B} are of interest. Assuming there is no free current, rewriting these two equations in terms of the magnetic field strength, $\mathbf{H}=\mathbf{B}/\mu_0$, and subsituting $c\equiv\frac{1}{\sqrt{\epsilon_0\mu_0}}$ yields
+\begin{align}
+\label{eq:dH_dt_vacuum}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\mu_0}\curl{\mathbf{E}}, \\
+\label{eq:dE_dt_vacuum}\epsilon_0\frac{\partial\mathbf{E}}{\partial t} &= \curl{\mathbf{H}}.
+\end{align}
+In a dielectric medium, we introduce the relative permittivity, $\epsilon_r$, which is material-specific. This allows us to write the permittivity as $\epsilon=\epsilon_r\epsilon_0$. We could also introduce the relative permeability, but in this work we will assume all materials are nonmagnetic, meaning $\mu_r=1$ and so $\mu=\mu_0$. Eqs.~\ref{eq:dH_dt_vacuum}~and~\ref{eq:dE_dt_vacuum} become
+\begin{align}
+\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\mu_0}\curl{\mathbf{E}}, \\
+\frac{\partial\mathbf{E}}{\partial t} &= \frac{1}{\epsilon}\curl{\mathbf{H}}.
+\end{align}
+
+A more general form of these equations uses the electric displacement, $\mathbf{D}$, which can be written as $\mathbf{D}(\omega) = \epsilon_0\epsilon_r^*(\omega)\mathbf{E}(\omega)$, where $\omega$ is the frequency of the wave and $\epsilon^*_r$ is the frequency dependent dielectric constant of the medium~\cite{Sullivan00}. If we assume, for a lossy dielectric medium with relative permittivity $\epsilon_r$ and conductivity $\sigma$, that $\epsilon^*_r$ is of the form
+\begin{equation}
+\epsilon^*_r(\omega) = \epsilon_r + \frac{\sigma}{i\omega\epsilon_0},
+\end{equation}
+then we see that the electric displacement is
+\begin{equation}
+\mathbf{D}(\omega) = \epsilon_0\epsilon_r \mathbf{E}(\omega) + \frac{\sigma}{i\omega}\mathbf{E}(\omega).
+\end{equation}
+Transforming this from the frequency domain to the time domain requires an identity which is derived in Appendix~\ref{ap:fourier}. In the time domain, the above equation is
+\begin{equation}
+\mathbf{D}(t) = \epsilon_0\epsilon_r \mathbf{E}(t)+\sigma\int_0^t\mathbf{E}(\tau)d\tau.
+\end{equation}
+So that the relevant equations for electromagnetic waves are then
+\begin{align}
+\label{eq:dH_dt_SI}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\mu_0}\curl{\mathbf{E}}, \\
+\label{eq:D_time_SI}\mathbf{D}(t) &= \epsilon_0\epsilon_r \mathbf{E}(t)+\sigma\int_0^t\mathbf{E}(\tau)d\tau, \\
+\label{eq:dD_dt_SI}\frac{\partial\mathbf{D}}{\partial t} &= \curl{\mathbf{H}}.
+\end{align}
+
+Finally, we express everything in Gaussian units instead of SI. The purpose for this is so that $E$, $D$, and $H$ are around the same order of magnitude~\cite{Sullivan00}. In Gaussian units,
+\begin{align}
+\mathbf{\tilde{E}}=\sqrt{\frac{\epsilon_0}{\mu_0}}\mathbf{E},\\
+\mathbf{\tilde{D}}=\sqrt{\frac{1}{\epsilon_0\mu_0}}\mathbf{D}.
+\end{align}
+This normalization yields the final set of equations that will be used to govern the propagation of electromagnetic waves in a lossy dielectric medium,
+\begin{align}
+\label{eq:dH_dt}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\curl{\mathbf{\tilde{E}}}, \\
+\label{eq:D_time}\mathbf{\tilde{D}}(t) &= \epsilon_r \mathbf{\tilde{E}}(t)+\frac{\sigma}{\epsilon_0}\int_0^t\mathbf{\tilde{E}}(\tau)d\tau, \\
+\label{eq:dD_dt}\frac{\partial\mathbf{\tilde{D}}}{\partial t} &= \frac{1}{\sqrt{\epsilon_0\mu_0}}\curl{\mathbf{H}}.
+\end{align}
+In these equations, the two parameters that are material-specific appear only in Eq.~\ref{eq:D_time}. Larger relative permittivities, $\epsilon_r$, decrease the strength of the electric field per unit charge, which has the effect of slowing electromagnetic waves. The dielectric conductivity, $\sigma$, represents the total dissipative effect of the material, accounting for any energy loss of the waves in the material.
+
+
+
+\section{Formulation of FDTD in 1D}
+
+\bibliography{References}
+\bibliographystyle{ieeetr}
+\newpage
+\onecolumn
+\appendix
+\section{Inverse Fourier Transform of $E(\omega)/i\omega$}
+\label{ap:fourier}
+
+First, we must develop some Fourier transforms of useful functions. Starting with the constant function, $x(t)=a$. Instead of directly evaluating the transform, we instead look at the inverse transform of $X(\omega)$,
+\begin{equation*}
+F^{-1}(X(\omega))=x(t)=a=\frac{1}{2\pi}\int_{-\infty}^{\infty}X(\omega)e^{i\omega t}d\omega.
+\end{equation*}
+Clearly, then $X(\omega)$ must be $2\pi a\delta(\omega)$. So,
+\begin{equation}
+a\rightleftharpoons 2\pi a\delta(\omega).
+\end{equation}
+Now, we examine the signum function,
+\begin{equation}
+\mathit{sgn}(t) =
+    \begin{cases}
+    +1~&\mathrm{if}~t>0 \\
+    0~&\mathrm{if}~t=0  \\
+    -1~&\mathrm{if}~t<0 \\
+    \end{cases}.
+\end{equation}
+Which has the property
+\begin{equation}
+\frac{d}{dt}\mathit{sgn}(t) = 2\delta(t).
+\end{equation}
+Taking the Fourier transform of this function follows, using integration by parts
+\begin{equation*}
+\begin{aligned}
+F(\mathit{sgn}(t))&= \int_{-\infty}^{\infty}\mathit{sgn}(t)e^{-i\omega t}dt \\
+&= \left[\frac{-1}{i\omega}\mathit{sgn}(t)e^{-i\omega t}\right]_{-\infty}^{\infty} - \int_{-\infty}^{\infty}\frac{-2}{i\omega}\delta(t)e^{-i\omega t}dt \\
+&= \frac{2}{i\omega}.
+\end{aligned}
+\end{equation*}
+So,
+\begin{equation}
+\mathit{sgn}(t)\rightleftharpoons\frac{2}{i\omega}.
+\end{equation}
+The last function we need is the Heaviside step function,
+\begin{equation}
+H(t) =
+    \begin{cases}
+    1~&\mathrm{if}~t\geq0 \\
+    0~&\mathrm{if}~t<0
+    \end{cases}.
+\end{equation}
+Noticing that $H(x)=\frac{\mathit{sgn}(t)+1}{2}$ we take the Fourier transform of $H$,
+\begin{equation*}
+\begin{aligned}
+F(H(t))&=F\left(\frac{\mathit{sgn}(t)+1}{2}\right) \\
+&=F\left(\frac{\mathit{sgn}(t)}{2}\right)+F\left(\frac{1}{2}\right) \\
+&= \frac{1}{i\omega}+\pi\delta(\omega).
+\end{aligned}
+\end{equation*}
+So,
+\begin{equation}
+H(t)\rightleftharpoons\frac{1}{i\omega}+\pi\delta(\omega).
+\end{equation}
+
+Now, consider a general function, $f(t)$ which can be written as the integral from $-\infty$ to $t$ of some other function, $g(t)$,
+\begin{equation}
+f(t)=\int_{-\infty}^{t}g(\tau)d\tau.
+\end{equation}
+This can be expressed as a convolution integral with the Heaviside function,
+\begin{equation}
+f(t)=\int_{-\infty}^{t}g(\tau)d\tau = \int_{-\infty}^{\infty}g(\tau)H(t-\tau)d\tau=(g*H)(t).
+\end{equation}
+Fourier's convolution theorem states that for any two functions, $\theta(t)$ and $\phi(t)$, whose Fourier transforms exist,
+\begin{equation}
+F((\theta*\phi)(t)) = \Theta(\omega)\Phi(\omega).
+\end{equation}
+Applying this to our function, $f(t)$, yields,
+\begin{equation}
+F(f(t)) = G(\omega)\left[\frac{1}{i\omega}+\pi\delta(\omega)\right].
+\end{equation}
+So,
+\begin{equation}
+\int_{-\infty}^{t}g(\tau)d\tau\rightleftharpoons G(\omega)\left[\frac{1}{i\omega}+\pi\delta(\omega)\right].
+\end{equation}
+Finally, we can use this identity to find $\mathbf{E}(t)$, given $\mathbf{E}(\omega)$. We apply the above identity to each of the components of $\mathbf{E(\omega)}\left[\frac{1}{i\omega}+\pi\delta(\omega)\right]$. Then,
+\begin{equation}
+\int_{-\infty}^{t}\mathbf{E}(\tau)d\tau\rightleftharpoons \mathbf{E}(\omega)\left[\frac{1}{i\omega}+\pi\delta(\omega)\right].
+\end{equation}
+We may assume that $\mathbf{E}(t)$ is zero for $t<0$ and $\mathbf{E}(\omega=0)=0$, in which case the above equation reduces to the desired identity,
+\begin{equation}
+\int_0^t\mathbf{E}(\tau)d\tau\rightleftharpoons \frac{\mathbf{E}(\omega)}{i\omega}.
+\end{equation}
+
+\end{document}
