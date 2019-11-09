@@ -111,49 +111,49 @@ class Media:
     """
         The Media class stores the Gaz and Gbz coefficient
         arrays for the media, which are calculated from
-        spacially dependent epsilon (permittivity) and
+        spacially dependent epsilon_r (relative permittivity) and
         sigma (conductivity) coefficients. It also stores
         the size of the media and the spacings (dx and dt).
 
-        For free space epsilon = 1 and sigma = 0.
+        For free space epsilon_r = 1 and sigma = 0.
 
         The default instance of this class is free space.
     """
-    def __init__(self, Nx, Ny, dx, epsilon = 1, sigma = 0):
+    def __init__(self, Nx, Ny, dx, epsilon_r = 1, sigma = 0):
 
-        epsilon_0 = 8.89E12 # permittivity of free space
+        epsilon_0 = 8.89E-12 # permittivity of free space
 
         self.shape = (Nx, Ny) # shape of the media
         self.dx    = dx       # spacing
         self.dt    = dx/(2*c) # timestep
 
-        # if epsilon and sigma are constant across all space,
+        # if epsilon_r and sigma are constant across all space,
         #   then they need to be made into arrays
-        if np.isscalar(epsilon) and np.isscalar(sigma):
-             epsilon = epsilon*np.ones((Ny,Nx))
+        if np.isscalar(epsilon_r) and np.isscalar(sigma):
+             epsilon_r = epsilon_r*np.ones((Ny,Nx))
              sigma   = sigma*np.ones((Ny,Nx))
 
-        # if only epsilon is constant across space,
+        # if only epsilon_r is constant across space,
         #   then it will be made into an array with the
         #   same shape as sigma
-        elif np.isscalar(epsilon):
+        elif np.isscalar(epsilon_r):
             assert(sigma.shape==(Ny,Nx))
-            epsilon = epsilon*np.ones(sigma.shape)
+            epsilon_r = epsilon_r*np.ones(sigma.shape)
 
         # if only sigma is constant across space,
         #   then it will be made into an array with the
-        #   same shape as epsilon
+        #   same shape as epsilon_r
         elif np.isscalar(sigma):
-            assert(epsilon.shape==(Ny,Nx))
-            sigma = sigma*np.ones(epsilon.shape)
+            assert(epsilon_r.shape==(Ny,Nx))
+            sigma = sigma*np.ones(epsilon_r.shape)
 
-        # if both epsilon and sigma are spacially dependent
+        # if both epsilon_r and sigma are spacially dependent
         #   then Gaz and Gbz can immediately be calculated
         else:
             assert(sigma.shape   == (Ny,Nx))
-            assert(epsilon.shape == (Ny,Nx))
+            assert(epsilon_r.shape == (Ny,Nx))
 
-        self.Gaz = 1/(epsilon+(sigma*self.dt/epsilon_0))
+        self.Gaz = 1/(epsilon_r+(sigma*self.dt/epsilon_0))
         self.Gbz = sigma*self.dt/epsilon_0
 
 class Pulse:
