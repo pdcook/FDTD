@@ -1,10 +1,14 @@
 \documentclass[12pt,twocolumn]{article}
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{setspace}
+\usepackage{float}
 \usepackage{tocloft}
+\usepackage{cuted}
+\usepackage{flushend}
 \usepackage[scaled]{beramono}
 \usepackage[T1]{fontenc}
 \usepackage{cite}
+\usepackage{amsthm}
 \usepackage{authblk}
 \usepackage[toc,page]{appendix} % for appendices
 \usepackage{gensymb}            % for degree symbol
@@ -27,8 +31,10 @@
 \captionsetup[subfigure]{labelformat=brace} % setup subfigure captions
 \graphicspath{{./Figures/}}     % figures in the Figures directory
 \DeclareGraphicsExtensions{.eps,.ps,.pdf}    % extensions for figures
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
 \newcommand{\comment}[1]{}      % command for multiline comments
-
+\setlength\stripsep{3pt plus 1pt minus 1pt}
 \renewcommand{\cftdotsep}{\cftnodots}
 \cftpagenumbersoff{figure}
 \cftpagenumbersoff{table}
@@ -50,7 +56,7 @@ In this work, the foundations behind the one- and two-dimensional finite-differe
 The goal of the finite-difference time-domain (FDTD) method is to simulate the propagation of electromagnetic waves in complex geometry. For instance, propagation through several different materials with different dielectric constants, or electrical conductivities. Problems such as these are often impossible to solve analytically, and so numerical approaches, such as this one, are required.
 
 This work is an overview of the derivation of the necessary expressions used in the FDTD method as well as two types of boundary conditions. Implementations of the method for both boundary conditions with results are presented and discussed.
-\section{Maxwell's Equations for Electromagnetic Waves}
+\section{Governing Equations for Electromagnetic Waves}
 The differiential form of Maxwell's equations for the electric field, $\mathbf{E}$, and magnetic field, $\mathbf{B}$, in vacuum, are~\cite{Jackson99}
 \begin{align}
 \div{\mathbf{E}} &= \frac{\rho}{\epsilon_0}, \\
@@ -108,10 +114,59 @@ This normalization yields the final set of equations that will be used to govern
 \label{eq:dD_dt}\frac{\partial\mathbf{\tilde{D}}}{\partial t} &= \frac{1}{\sqrt{\epsilon_0\mu_0}}\curl{\mathbf{H}}.
 \end{align}
 In these equations, the two parameters that are material-specific appear only in Eq.~\ref{eq:D_time}. Larger relative permittivities, $\epsilon_r$, decrease the strength of the electric field per unit charge, which has the effect of slowing electromagnetic waves. The dielectric conductivity, $\sigma$, represents the total dissipative effect of the material, accounting for any energy loss of the waves in the material.
+\section{Finite Difference Approximation of the Derivative}
+Let $f(x)$ be any continuous and thrice differientiable function with bounded derivatives. If we want to obtain an approximation of $f'(x)$, we start by considering $f(x+h)$ and $f(x-h)$, where $h$ is a small displacement. Theorem~\ref{thm:lagrange} in Appendix~\ref{ap:lagrange} allows us to write $f(x+h)$ and $f(x-h)$ as shown in Eq.~\ref{eq:expansions}.
+\vspace{-20pt}
+\begin{strip}
+\begin{equation}
+\label{eq:expansions}
+\begin{aligned}
+f(x+h) &= f(x) + hf'(x) + \frac{h^2}{2}f''(x) + \frac{h^3}{3!}f'''(\eta_1) \\
+f(x-h) &= f(x) -hf'(x) + \frac{h^2}{2}f''(x) -\frac{h^3}{3!}f'''(\eta_2)
+\end{aligned}
+\end{equation}
+\end{strip}
+\begin{strip}
+\begin{equation}
+\label{eq:first_finite}
+\frac{f(x+h)-f(x-h)}{2h} = f'(x) + \frac{h^2}{6}\frac{f'''(\eta_1)+f'''(\eta_2)}{2}
+\end{equation}
+\begin{equation}
+\label{eq:second_finite}
+\frac{f(x+h)-f(x-h)}{2h} = f'(x) + \frac{h^2}{6}f'''(\eta)
+\end{equation}
+\end{strip}
 
+\noindent Subtracting both expressions in Eq.~\ref{eq:expansions} and rearranging yields Eq.~\ref{eq:first_finite}. Here, $\eta_1$ and $\eta_2$ are two unknown points in the domain of $f$. By applying the intermediate value theorem to the last term in Eq.~\ref{eq:first_finite}, the two unknown points can be reduced to a single unknown point, $\eta$. This leads to Eq.~\ref{eq:second_finite}. This equation suggests an approximation for the first derivative,
+\begin{equation}
+\label{eq:approx_central_difference}
+f'(x) \approx \frac{f(x+h)-f(x-h)}{2h}.
+\end{equation}
+With an error of
+\begin{equation}
+E = \frac{h^2}{6}f'''(\eta).
+\end{equation}
 
-
+Since $f$ and all derivatives of $f$ are bounded, we may introduce $M$, the absolute maxmimum value of $f'''(x)$, meaning $|f'''(x)|\leq M~\forall~x$. Thus, the error term is a constant multiplied by $h^2$. We say then that this error is an order of $h^2$, or
+\begin{equation}
+\label{eq:central_difference}
+f'(x) = \frac{f(x+h)-f(x-h)}{2h} + O(h^2).
+\end{equation}
+This is known as the central difference approximation of the derivative. Due to the error being in $h^2$, this is a second order approximation. There are many other approximations of the first derivative as well as higher order derivatives. However, this is the only derivative approximation necessary in FDTD.
 \section{Formulation of FDTD in 1D}
+For example purposes, a formulation of the FDTD method in 1D is presented here. First, we must choose an axis of propagation. Arbitrarily, suppose the wave travels only in the $\hat{z}$ direction. Eqs.~\ref{eq:dH_dt}~and~\ref{eq:dD_dt} become
+\begin{align}
+\frac{\partial H_y}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z} \\
+\frac{\partial \tilde{D_x}}{\partial t} &= \frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial H_y}{\partial z}
+\end{align}
+Using the central difference approximation of the derivative, in Eq.~\ref{eq:approx_central_difference}, on each of the derivatives---using $h/2$ for the spatial stepsize and $k/2$ for the temporal stepsize---leads us to Eqs.~\ref{eq:first_discrete_dH_dt}~and~\ref{eq:first_discrete_dD_dt}.
+\vspace{-50pt}
+\begin{strip}
+\begin{align}
+\label{eq:first_discrete_dH_dt}\frac{H_y(z,t+k/2)-H_y(z,t-k/2)}{k} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\tilde{E_x}(z+h/2,t)-\tilde{E_x}(z-h/2,t)}{h} \\
+\label{eq:first_discrete_dD_dt}\frac{\tilde{D_x}(z,t+k/2)-\tilde{D_x}(z,t-k/2)}{k} &= \frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{H_y(z+h/2,t)-H_y(z-h/2,t)}{h}
+\end{align}
+\end{strip}
 
 \bibliography{References}
 \bibliographystyle{ieeetr}
@@ -203,5 +258,50 @@ We may assume that $\mathbf{E}(t)$ is zero for $t<0$ and $\mathbf{E}(\omega=0)=0
 \begin{equation}
 \int_0^t\mathbf{E}(\tau)d\tau\rightleftharpoons \frac{\mathbf{E}(\omega)}{i\omega}.
 \end{equation}
-
+\newpage
+\section{The Lagrange Remainder Theorem}
+\label{ap:lagrange}
+\begin{theorem}
+\label{thm:lagrange}
+Let $f(x)$ be a function which is continuous on $[a,b]$ and $(n+1)$ differientiable on $(a,b)$. Then, for each $x\in[a,b]$ there exists $\eta\in[a,b]$ such that\footnote{The final term in this equation is called the remainder term of the $n^\mathrm{th}$ Taylor polynomial of $f$. This is because it is the error between $f$ and the $n^\mathrm{th}$ Taylor polynomial of $f$, $T_n$. That is to say, \\$f(x)-T_n(x) = \frac{f^{(n+1)}(\eta)}{(n+1)!}~\mathrm{for~some}~\eta\in[a,b]$}
+\begin{equation}
+f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2 + \cdots + \frac{f^{(n)}(a)}{n!}(x-a)^n + \frac{f^{(n+1)}(\eta)}{(n+1)!}(x-a)^{n+1}.
+\label{eq:lagrange}
+\end{equation}
+\end{theorem}
+\begin{proof}
+Let $T_n$ be the $n^\mathrm{th}$ Taylor polynomial of $f$, centered at $a$. That is,
+\begin{equation}
+T_n(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2 + \cdots + \frac{f^{(n)}(a)}{n!}(x-a)^n.
+\end{equation}
+Now choose $K\in\mathbb{R}$ such that
+\begin{equation}
+\label{eq:K}
+f(b) = T_n(b) + K(b-a)^{n+1}.
+\end{equation}
+We will show that this $K$ is coefficient of the final term in Eq.~\ref{eq:lagrange}. First we consider the function $F$, defined as
+\begin{equation}
+F(x) = f(x) - T_n(x) - K(x-a)^{n+1}.
+\end{equation}
+Notice that $F^{(k)}(a)=0~\mathrm{for}~k\leq n$ since
+\begin{equation}
+T_n^{(k)}(x) = f^{(k)}(a) + f^{(k+1)}(a)(x-a) + \cdots + \frac{f^{(n)}(a)}{(n-k)!}(x-a)^{n-k}~\mathrm{for}~k\leq n.
+\end{equation}
+So $T_n^{(k)}(a)=f^{(k)}(a)$ for $k\leq n$. And,
+\begin{equation}
+\frac{d^k}{dx^k}K(x-a)^{n+1} = \frac{K(n+1)!}{(n+1-k)!}(x-a)^{n+1-k}.
+\end{equation}
+This demonstrates that $F^{(k)}(a)=0~\mathrm{for}~k\leq n$. Our choice of $K$ garuntees $F(b)=0$, so we see that $F(a)=F(b)=0$. This allows us to apply Rolle's theorem to $F$. The theorem is an extension to the mean value theorem, and it states that for any function, $g$, that is continuous on $[a,b]$ and differientiable on $(a,b)$, if $g(a)=g(b)$ then there exists at least one $c\in[a,b]$ such that $g'(c)=0$. Applying this theorem to $F$ tells us that there exists a $c_1\in[a,b]$ such that $F'(c_1)=0$. Now we examine $F'$. We have shown above that $F'(a)=0$, and we have just demonstrated that $F'(c_1)=0$, thus $F'(a)=F'(c_1)=0$. Applying Rolle's theorem now to $F'$ tells us that there exists $c_2\in[a,c_1]$ such that $F''(c_2)=0$. We continue this process on the higher derivatives of $F$ up to $F^{(n+1)}$. Here, Rolle's theorem garuntees the existence of a $c_{n+1}\in[a,c_n]$ such that $F^{(n+1)}(c_{n+1})=0$. However, since $T_n^{(n+1)}\equiv 0$, we know that $F^{(n+1)}$ is
+\begin{equation}
+F^{(n+1)}(x) = f^{(n+1)}(x) - K(n+1)!.
+\end{equation}
+So, using the fact that $F^{(n+1)}(c_{n+1})=0$,
+\begin{equation}
+K = \frac{f^{(n+1)}(c_{n+1})}{(n+1)!}.
+\end{equation}
+Let $\eta=c_{n+1}$. Since $[a,c_{n+1}]\subseteq[a,c_n]\subseteq[a,c_{n-1}]\subseteq\cdots\subseteq[a,b]$, we know $\eta\in[a,b]$. Moreover, since our choice of $K$ in Eq.~\ref{eq:K} could be repeated with $b$ replaced by any $x\in[a,b]$, the entire process could be done with any point in $[a,b]$, yielding a not-necessarily different $\eta$ for each point. However, each $\eta$ would still be in $[a,b]$ since $[a,x]\subseteq[a,b]~\forall~x\in[a,b]$. Plugging this expression for $K$ back into Eq.~\ref{eq:K} shows that for each $x\in[a,b]$, there exists $\eta\in[a,b]$ such that
+\begin{equation}
+f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2 + \cdots + \frac{f^{(n)}(a)}{n!}(x-a)^n + \frac{f^{(n+1)}(\eta)}{(n+1)!}(x-a)^{n+1}.
+\end{equation}
+\end{proof}
 \end{document}
