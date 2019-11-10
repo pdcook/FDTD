@@ -144,7 +144,7 @@ f'(x) \approx \frac{f(x+h)-f(x-h)}{2h}.
 \end{equation}
 With an error of
 \begin{equation}
-E = \frac{h^2}{6}f'''(\eta).
+|E| = |\frac{h^2}{6}f'''(\eta)|.
 \end{equation}
 
 Since $f$ and all derivatives of $f$ are bounded, we may introduce $M$, the absolute maxmimum value of $f'''(x)$, meaning $|f'''(x)|\leq M~\forall~x$. Thus, the error term is a constant multiplied by $h^2$. We say then that this error is an order of $h^2$, or
@@ -263,7 +263,7 @@ We may assume that $\mathbf{E}(t)$ is zero for $t<0$ and $\mathbf{E}(\omega=0)=0
 \label{ap:lagrange}
 \begin{theorem}
 \label{thm:lagrange}
-Let $f(x)$ be a function which is continuous on $[a,b]$ and $(n+1)$ differientiable on $(a,b)$. Then, for each $x\in[a,b]$ there exists $\eta\in[a,b]$ such that\footnote{The final term in this equation is called the remainder term of the $n^\mathrm{th}$ Taylor polynomial of $f$. This is because it is the error between $f$ and the $n^\mathrm{th}$ Taylor polynomial of $f$, $T_n$. That is to say, \\$f(x)-T_n(x) = \frac{f^{(n+1)}(\eta)}{(n+1)!}~\mathrm{for~some}~\eta\in[a,b]$}
+Let $f(x)$ be a function which is continuous on $[a,b]$ and $(n+1)$ differientiable on $(a,b)$. Then, for each $x\in[a,b]$ there exists $\eta\in[a,b]$ such that\footnote{The final term in this equation is called the Lagrange remainder of the $n^\mathrm{th}$ Taylor polynomial of $f$. This is because it is the error between $f$ and the $n^\mathrm{th}$ Taylor polynomial of $f$, $T_n$. That is to say, \\$f(x)-T_n(x) = \frac{f^{(n+1)}(\eta)}{(n+1)!}~\mathrm{for~some}~\eta\in[a,b]$}
 \begin{equation}
 f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2 + \cdots + \frac{f^{(n)}(a)}{n!}(x-a)^n + \frac{f^{(n+1)}(\eta)}{(n+1)!}(x-a)^{n+1}.
 \label{eq:lagrange}
@@ -291,7 +291,7 @@ So $T_n^{(k)}(a)=f^{(k)}(a)$ for $k\leq n$. And,
 \begin{equation}
 \frac{d^k}{dx^k}K(x-a)^{n+1} = \frac{K(n+1)!}{(n+1-k)!}(x-a)^{n+1-k}.
 \end{equation}
-This demonstrates that $F^{(k)}(a)=0~\mathrm{for}~k\leq n$. Our choice of $K$ garuntees $F(b)=0$, so we see that $F(a)=F(b)=0$. This allows us to apply Rolle's theorem to $F$. The theorem is an extension to the mean value theorem, and it states that for any function, $g$, that is continuous on $[a,b]$ and differientiable on $(a,b)$, if $g(a)=g(b)$ then there exists at least one $c\in[a,b]$ such that $g'(c)=0$. Applying this theorem to $F$ tells us that there exists a $c_1\in[a,b]$ such that $F'(c_1)=0$. Now we examine $F'$. We have shown above that $F'(a)=0$, and we have just demonstrated that $F'(c_1)=0$, thus $F'(a)=F'(c_1)=0$. Applying Rolle's theorem now to $F'$ tells us that there exists $c_2\in[a,c_1]$ such that $F''(c_2)=0$. We continue this process on the higher derivatives of $F$ up to $F^{(n+1)}$. Here, Rolle's theorem garuntees the existence of a $c_{n+1}\in[a,c_n]$ such that $F^{(n+1)}(c_{n+1})=0$. However, since $T_n^{(n+1)}\equiv 0$, we know that $F^{(n+1)}$ is
+This demonstrates that $F^{(k)}(a)=0~\mathrm{for}~k\leq n$. Our choice of $K$ guarantees $F(b)=0$, so we see that $F(a)=F(b)=0$. This allows us to apply Rolle's theorem to $F$. The theorem is a special case of the mean value theorem, and it states that for any function, $g$, that is continuous on $[a,b]$ and differientiable on $(a,b)$, if $g(a)=g(b)$ then there exists at least one $c\in[a,b]$ such that $g'(c)=0$. Applying this theorem to $F$ tells us that there exists a $c_1\in[a,b]$ such that $F'(c_1)=0$. Now we examine $F'$. We have shown above that $F'(a)=0$, and we have just demonstrated that $F'(c_1)=0$, thus $F'(a)=F'(c_1)=0$. Applying Rolle's theorem now to $F'$ tells us that there exists $c_2\in[a,c_1]$ such that $F''(c_2)=0$. We continue this process on the higher derivatives of $F$ up to $F^{(n+1)}$. Here, Rolle's theorem guarantees the existence of a $c_{n+1}\in[a,c_n]$ such that $F^{(n+1)}(c_{n+1})=0$. However, since $T_n^{(n+1)}\equiv 0$, we know that $F^{(n+1)}$ is
 \begin{equation}
 F^{(n+1)}(x) = f^{(n+1)}(x) - K(n+1)!.
 \end{equation}
