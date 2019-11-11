@@ -144,7 +144,7 @@ f'(x) \approx \frac{f(x+h)-f(x-h)}{2h}.
 \end{equation}
 With an error of
 \begin{equation}
-|E| = |\frac{h^2}{6}f'''(\eta)|.
+|E| = \left|\frac{h^2}{6}f'''(\eta)\right|.
 \end{equation}
 
 Since $f$ and all derivatives of $f$ are bounded, we may introduce $M$, the absolute maxmimum value of $f'''(x)$, meaning $|f'''(x)|\leq M~\forall~x$. Thus, the error term is a constant multiplied by $h^2$. We say then that this error is an order of $h^2$, or
@@ -156,18 +156,76 @@ This is known as the central difference approximation of the derivative. Due to 
 \section{Formulation of FDTD in 1D}
 For example purposes, a formulation of the FDTD method in 1D is presented here. First, we must choose an axis of propagation. Arbitrarily, suppose the wave travels only in the $\hat{z}$ direction. Eqs.~\ref{eq:dH_dt}~and~\ref{eq:dD_dt} become
 \begin{align}
-\frac{\partial H_y}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z} \\
-\frac{\partial \tilde{D_x}}{\partial t} &= \frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial H_y}{\partial z}
+\frac{\partial H_y}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}, \\
+\frac{\partial \tilde{D_x}}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial H_y}{\partial z}.
 \end{align}
-Using the central difference approximation of the derivative, in Eq.~\ref{eq:approx_central_difference}, on each of the derivatives---using $h/2$ for the spatial stepsize and $k/2$ for the temporal stepsize---leads us to Eqs.~\ref{eq:first_discrete_dH_dt}~and~\ref{eq:first_discrete_dD_dt}.
-\vspace{-50pt}
+We will interleave $H_y$ and $\tilde{D_x}$ both spatially and temporally. This is one of the fundamental features of the FDTD method~\cite{Sullivan00}. To interleave the two fields, we evaluate them---as well as their derivatives---offset from one another by $\Delta z/2$ in space and $\Delta t/2$ in time,
+\begin{equation}
+\label{eq:offset_dD_dt}\frac{\partial \tilde{D_x}}{\partial t}(z, t) = -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial H_y}{\partial z}(z, t)
+\end{equation}
+\vspace{-65pt}
+\begin{strip}
+\begin{equation}
+\label{eq:offset_dH_dt}\frac{\partial H_y}{\partial t}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right) = -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right)
+\end{equation}
+\end{strip}
 \begin{strip}
 \begin{align}
-\label{eq:first_discrete_dH_dt}\frac{H_y(z,t+k/2)-H_y(z,t-k/2)}{k} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\tilde{E_x}(z+h/2,t)-\tilde{E_x}(z-h/2,t)}{h} \\
-\label{eq:first_discrete_dD_dt}\frac{\tilde{D_x}(z,t+k/2)-\tilde{D_x}(z,t-k/2)}{k} &= \frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{H_y(z+h/2,t)-H_y(z-h/2,t)}{h}
+\label{eq:first_discrete_dD_dt}\frac{\tilde{D_x}\left(z,t+\frac{\Delta t}{2}\right)-\tilde{D_x}\left(z,t-\frac{\Delta t}{2}\right)}{\Delta t} = -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{H_y\left(z+\frac{\Delta z}{2},t\right)-H_y\left(z-\frac{\Delta z}{2},t\right)}{\Delta z} \\
+\label{eq:first_discrete_dH_dt}\frac{H_y\left(z+\frac{\Delta z}{2},t+\Delta t\right)-H_y\left(z+\frac{\Delta z}{2},t\right)}{\Delta t} = -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\tilde{E_x}\left(z+\Delta z,t+\frac{\Delta t}{2}\right)-\tilde{E_x}\left(z,t+\frac{\Delta t}{2}\right)}{\Delta z}
 \end{align}
 \end{strip}
+Using the central difference approximation of the derivative, Eq.~\ref{eq:approx_central_difference}, on each of the derivatives---using the same spacing as the offsets from the interleaving process, $\Delta z/2$ for the spatial stepsize and $\Delta t/2$ for the temporal stepsize---leads us to Eqs.~\ref{eq:first_discrete_dD_dt}~and~\ref{eq:first_discrete_dH_dt}.
 
+Now, we impose restrictions on $\Delta t$ and $\Delta z$ to ensure stability. A discussion including the reasoning for this is presented in the next section. By forcing $\Delta t=\Delta z/(2c_0)$ (recall $c_0=1/\sqrt{\epsilon_0\mu_0}$), we guarantee the stability of the numerical method. Using this condition and rearranging Eqs.~\ref{eq:first_discrete_dD_dt}~and~\ref{eq:first_discrete_dH_dt} into an iterative form leads to
+\begin{equation}
+\label{eq:second_discrete_dD_dt}\begin{split}
+\tilde{D_x}\left(z,t+\frac{\Delta t}{2}\right)&=\tilde{D_x}\left(z,t-\frac{\Delta t}{2}\right) \\
+&   -\frac{1}{2}\left[H_y\left(z+\frac{\Delta z}{2},t\right)\right. \\
+&- \left. H_y\left(z-\frac{\Delta z}{2},t\right)\right],
+\end{split}
+\end{equation}
+\begin{equation}
+\label{eq:second_discrete_dH_dt}\begin{split}
+H_y\left(z+\frac{\Delta z}{2},t+\Delta t\right)=H_y\left(z+\frac{\Delta z}{2},t\right) \\
+     -\frac{1}{2}\left[\tilde{E_x}\left(z+\Delta z,t+\frac{\Delta t}{2}\right)\right. \\
+\left. -\tilde{E_x}\left(z,t+\frac{\Delta t}{2}\right)\right].
+\end{split}
+\end{equation}
+Equation~\ref{eq:second_discrete_dD_dt} tells us the entire $\tilde{D_x}$ field at the next time step if both $\tilde{D_x}$ and $H_y$ are known at the previous time steps. Likewise, Eq.~\ref{eq:second_discrete_dH_dt} tells us the entire $H_y$ field at the next time step if $\tilde{E_x}$ and $H_y$ are known at the previous time steps. We can discretize these expressions by defining
+\begin{equation}
+\begin{aligned}
+\left\{
+\begin{split}
+z_i&=i\Delta z \\
+t_j&=\left(j+\frac{1}{2}\right)\Delta t
+\end{split}\right.~~&~\mathrm{for}~\tilde{E_x}~\mathrm{and}~\tilde{D_x}, \\
+\left\{
+\begin{split}
+z_i&=\left(i+\frac{1}{2}\right)\Delta z \\
+t_j&=j\Delta t
+\end{split}\right.~~&~\mathrm{for}~H_y.
+\end{aligned}
+\end{equation}
+Which results in much more succinct expressions,
+\begin{align}
+\label{eq:third_discrete_dD_dt}\begin{split}
+&\tilde{D_x}(z_i,t_{j})=\tilde{D_x}(z_i,t_{j-1}) \\
+&   -\frac{1}{2}\left[H_y(z_{i},t_j)-H_y(z_{i-1},t_j)\right].
+\end{split} \\
+\label{eq:third_discrete_dH_dt}\begin{split}
+&H_y(z_i,t_{j+1}) =H_y(z_i,t_{j}) \\
+    & -\frac{1}{2}\left[\tilde{E_x}(z_{i+1},t_j)-\tilde{E_x}(z_{i},t_j)\right],
+\end{split}
+\end{align}
+
+ However, we still need a way to find $\tilde{E_x}$ at the next timestep. For this, we return to Eq.~\ref{eq:D_time}. The discrete form of the integral is just a summation, so the discrete form of Eq.~\ref{eq:D_time} is
+\begin{equation}
+\label{eq:first_discrete_D_time}\tilde{D_x}(t)
+\end{equation}
+
+
+\section{Stability}
 \bibliography{References}
 \bibliographystyle{ieeetr}
 \newpage
