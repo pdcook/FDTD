@@ -59,12 +59,14 @@ The goal of the finite-difference time-domain (FDTD) method is to simulate the p
 This work is an overview of the derivation of the necessary expressions used in the FDTD method as well as two types of boundary conditions. Implementations of the method for both boundary conditions with results are presented and discussed.
 \section{Governing Equations for Electromagnetic Waves}
 The differiential form of Maxwell's equations for the electric field, $\mathbf{E}$, and magnetic field, $\mathbf{B}$, in vacuum, are~\cite{Jackson99}
+\begin{subequations}
 \begin{align}
 \div{\mathbf{E}} &= \frac{\rho}{\epsilon_0}, \\
 \div{\mathbf{B}} &= 0, \\
 \label{eq:curl_E}\curl{\mathbf{E}}&= -\frac{\partial\mathbf{B}}{\partial t}, \\
 \label{eq:curl_B}\curl{\mathbf{B}}&= \mu_0\mathbf{J}+\frac{1}{c^2}\frac{\partial\mathbf{E}}{\partial t}.
 \end{align}
+\end{subequations}
 Where
 \begin{itemize}
 \item $\rho$ is the free electric charge density
@@ -74,15 +76,19 @@ Where
 \item $c$ is the speed of light, $c\equiv\frac{1}{\sqrt{\epsilon_0\mu_0}}$
 \end{itemize}
 In the context of electromagnetic wave propagation, only Eqs.~\ref{eq:curl_E}~and~\ref{eq:curl_B} are of interest. Assuming there is no free current, rewriting these two equations in terms of the magnetic field strength, $\mathbf{H}=\mathbf{B}/\mu_0$, and subsituting $c\equiv\frac{1}{\sqrt{\epsilon_0\mu_0}}$ yields
+\begin{subequations}
 \begin{align}
 \label{eq:dH_dt_vacuum}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\mu_0}\curl{\mathbf{E}}, \\
 \label{eq:dE_dt_vacuum}\epsilon_0\frac{\partial\mathbf{E}}{\partial t} &= \curl{\mathbf{H}}.
 \end{align}
+\end{subequations}
 In a dielectric medium, we introduce the relative permittivity, $\epsilon_r$, which is material-specific. This allows us to write the permittivity as $\epsilon=\epsilon_r\epsilon_0$. We could also introduce the relative permeability, but in this work we will assume all materials are nonmagnetic, meaning $\mu_r=1$ and so $\mu=\mu_0$. Eqs.~\ref{eq:dH_dt_vacuum}~and~\ref{eq:dE_dt_vacuum} become
+\begin{subequations}
 \begin{align}
 \frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\mu_0}\curl{\mathbf{E}}, \\
 \frac{\partial\mathbf{E}}{\partial t} &= \frac{1}{\epsilon}\curl{\mathbf{H}}.
 \end{align}
+\end{subequations}
 
 A more general form of these equations uses the electric displacement, $\mathbf{D}$, which can be written as $\mathbf{D}(\omega) = \epsilon_0\epsilon_r^*(\omega)\mathbf{E}(\omega)$, where $\omega$ is the frequency of the wave and $\epsilon^*_r$ is the frequency dependent dielectric constant of the medium~\cite{Sullivan00}. If we assume, for a lossy dielectric medium with relative permittivity $\epsilon_r$ and conductivity $\sigma$, that $\epsilon^*_r$ is of the form
 \begin{equation}
@@ -97,23 +103,29 @@ Transforming this from the frequency domain to the time domain requires an ident
 \mathbf{D}(t) = \epsilon_0\epsilon_r \mathbf{E}(t)+\sigma\int_0^t\mathbf{E}(\tau)d\tau.
 \end{equation}
 So that the relevant equations for electromagnetic waves are then
+\begin{subequations}
 \begin{align}
 \label{eq:dH_dt_SI}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\mu_0}\curl{\mathbf{E}}, \\
 \label{eq:D_time_SI}\mathbf{D}(t) &= \epsilon_0\epsilon_r \mathbf{E}(t)+\sigma\int_0^t\mathbf{E}(\tau)d\tau, \\
 \label{eq:dD_dt_SI}\frac{\partial\mathbf{D}}{\partial t} &= \curl{\mathbf{H}}.
 \end{align}
+\end{subequations}
 
-Finally, we express everything in Gaussian units instead of SI. The purpose for this is so that $E$, $D$, and $H$ are around the same order of magnitude~\cite{Sullivan00}. In Gaussian units,
+Finally, we express everything in Gaussian units instead of SI\@. The purpose for this is so that $E$, $D$, and $H$ are around the same order of magnitude~\cite{Sullivan00}. In Gaussian units,
+\begin{subequations}
 \begin{align}
 \mathbf{\tilde{E}}=\sqrt{\frac{\epsilon_0}{\mu_0}}\mathbf{E},\\
 \mathbf{\tilde{D}}=\sqrt{\frac{1}{\epsilon_0\mu_0}}\mathbf{D}.
 \end{align}
+\end{subequations}
 This normalization yields the final set of equations that will be used to govern the propagation of electromagnetic waves in a lossy dielectric medium,
+\begin{subequations}
 \begin{empheq}[box=\fbox]{align}
 \label{eq:dH_dt}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\curl{\mathbf{\tilde{E}}}, \\
 \label{eq:D_time}\mathbf{\tilde{D}}(t) &= \epsilon_r \mathbf{\tilde{E}}(t)+\frac{\sigma}{\epsilon_0}\int_0^t\mathbf{\tilde{E}}(\tau)d\tau, \\
 \label{eq:dD_dt}\frac{\partial\mathbf{\tilde{D}}}{\partial t} &= \frac{1}{\sqrt{\epsilon_0\mu_0}}\curl{\mathbf{H}}.
 \end{empheq}
+\end{subequations}
 In these equations, the two parameters that are material-specific appear only in Eq.~\ref{eq:D_time}. Larger relative permittivities, $\epsilon_r$, decrease the strength of the electric field per unit charge, which has the effect of slowing electromagnetic waves. The dielectric conductivity, $\sigma$, represents the total dissipative effect of the material, accounting for any energy loss of the waves in the material.
 \section{Finite Difference Approximation of the Derivative}
 Let $f(x)$ be any continuous and thrice differientiable function with bounded derivatives. If we want to obtain an approximation of $f'(x)$, we start by considering $f(x+h)$ and $f(x-h)$, where $h$ is a small displacement. Theorem~\ref{thm:lagrange} in Appendix~\ref{ap:lagrange} allows us to write $f(x+h)$ and $f(x-h)$ as shown in Eq.~\ref{eq:expansions}.
@@ -127,6 +139,7 @@ f(x-h) &= f(x) -hf'(x) + \frac{h^2}{2}f''(x) -\frac{h^3}{3!}f'''(\eta_2)
 \end{aligned}
 \end{equation}
 \end{strip}
+\begin{subequations}
 \begin{strip}
 \begin{equation}
 \label{eq:first_finite}
@@ -137,6 +150,7 @@ f(x-h) &= f(x) -hf'(x) + \frac{h^2}{2}f''(x) -\frac{h^3}{3!}f'''(\eta_2)
 \frac{f(x+h)-f(x-h)}{2h} = f'(x) + \frac{h^2}{6}f'''(\eta)
 \end{equation}
 \end{strip}
+\end{subequations}
 
 \noindent Subtracting both expressions in Eq.~\ref{eq:expansions} and rearranging yields Eq.~\ref{eq:first_finite}. Here, $\eta_1$ and $\eta_2$ are two unknown points in the domain of $f$. By applying the intermediate value theorem to the last term in Eq.~\ref{eq:first_finite}, the two unknown points can be reduced to a single unknown point, $\eta$. This leads to Eq.~\ref{eq:second_finite}. This equation suggests an approximation for the first derivative,
 \begin{equation}
@@ -154,13 +168,16 @@ Since $f$ and all derivatives of $f$ are bounded, we may introduce $M$, the abso
 f'(x) = \frac{f(x+h)-f(x-h)}{2h} + O(h^2).
 \end{equation}
 This is known as the central difference approximation of the derivative. Due to the error being in $h^2$, this is a second order approximation. There are many other approximations of the first derivative as well as higher order derivatives. However, this is the only derivative approximation necessary in FDTD.
-\section{Formulation of FDTD in 1D}
-For example purposes, a formulation of the FDTD method in 1D is presented here. First, we must choose an axis of propagation. Arbitrarily, suppose the wave travels only in the $\hat{z}$ direction. Eqs.~\ref{eq:dH_dt}~and~\ref{eq:dD_dt} become
+\section{Formulation of FDTD in One Dimension}
+For example purposes, a formulation of the FDTD method in one dimension is presented here. First, we must choose an axis of propagation. Arbitrarily, suppose the wave travels only in the $\hat{z}$ direction. Eqs.~\ref{eq:dH_dt}~and~\ref{eq:dD_dt} become
+\begin{subequations}
 \begin{align}
 \frac{\partial H_y}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}, \\
 \frac{\partial \tilde{D_x}}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial H_y}{\partial z}.
 \end{align}
+\end{subequations}
 We will interleave $H_y$ and $\tilde{D_x}$ both spatially and temporally. This is one of the fundamental features of the FDTD method~\cite{Sullivan00}. To interleave the two fields, we evaluate them---as well as their derivatives---offset from one another by $\Delta z/2$ in space and $\Delta t/2$ in time,
+\begin{subequations}
 \begin{equation}
 \label{eq:offset_dD_dt}\frac{\partial \tilde{D_x}}{\partial t}(z, t) = -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial H_y}{\partial z}(z, t)
 \end{equation}
@@ -170,12 +187,15 @@ We will interleave $H_y$ and $\tilde{D_x}$ both spatially and temporally. This i
 \label{eq:offset_dH_dt}\frac{\partial H_y}{\partial t}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right) = -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right)
 \end{equation}
 \end{strip}
+\end{subequations}
+\begin{subequations}
 \begin{strip}
 \begin{align}
-\label{eq:first_discrete_dD_dt}\frac{\tilde{D_x}\left(z,t+\frac{\Delta t}{2}\right)-\tilde{D_x}\left(z,t-\frac{\Delta t}{2}\right)}{\Delta t} = -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{H_y\left(z+\frac{\Delta z}{2},t\right)-H_y\left(z-\frac{\Delta z}{2},t\right)}{\Delta z} \\
-\label{eq:first_discrete_dH_dt}\frac{H_y\left(z+\frac{\Delta z}{2},t+\Delta t\right)-H_y\left(z+\frac{\Delta z}{2},t\right)}{\Delta t} = -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\tilde{E_x}\left(z+\Delta z,t+\frac{\Delta t}{2}\right)-\tilde{E_x}\left(z,t+\frac{\Delta t}{2}\right)}{\Delta z}
+\label{eq:first_discrete_dD_dt}\frac{\tilde{D_x}\left(z,t+\frac{\Delta t}{2}\right)-\tilde{D_x}\left(z,t-\frac{\Delta t}{2}\right)}{\Delta t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{H_y\left(z+\frac{\Delta z}{2},t\right)-H_y\left(z-\frac{\Delta z}{2},t\right)}{\Delta z} \\
+\label{eq:first_discrete_dH_dt}\frac{H_y\left(z+\frac{\Delta z}{2},t+\Delta t\right)-H_y\left(z+\frac{\Delta z}{2},t\right)}{\Delta t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\tilde{E_x}\left(z+\Delta z,t+\frac{\Delta t}{2}\right)-\tilde{E_x}\left(z,t+\frac{\Delta t}{2}\right)}{\Delta z}
 \end{align}
 \end{strip}
+\end{subequations}
 Using the central difference approximation of the derivative, Eq.~\ref{eq:approx_central_difference}, on each of the derivatives---using the same spacing as the offsets from the interleaving process, $\Delta z/2$ for the spatial stepsize and $\Delta t/2$ for the temporal stepsize---leads us to Eqs.~\ref{eq:first_discrete_dD_dt}~and~\ref{eq:first_discrete_dH_dt}.
 
 Now, we impose restrictions on $\Delta t$ and $\Delta z$ to ensure stability. A discussion including the reasoning for this is presented in the next section. By forcing
@@ -183,6 +203,7 @@ Now, we impose restrictions on $\Delta t$ and $\Delta z$ to ensure stability. A 
 \Delta t=\frac{\Delta z}{2c_0},
 \end{equation}
  where $c_0=1/\sqrt{\epsilon_0\mu_0}$ just as before, we guarantee the stability of the numerical method. Using this condition and rearranging Eqs.~\ref{eq:first_discrete_dD_dt}~and~\ref{eq:first_discrete_dH_dt} into an iterative form leads to
+\begin{subequations}
 \begin{equation}
 \label{eq:second_discrete_dD_dt}\begin{split}
 \tilde{D_x}\left(z,t+\frac{\Delta t}{2}\right)&=\tilde{D_x}\left(z,t-\frac{\Delta t}{2}\right) \\
@@ -197,6 +218,7 @@ H_y\left(z+\frac{\Delta z}{2},t+\Delta t\right)=H_y\left(z+\frac{\Delta z}{2},t\
 \left. -\tilde{E_x}\left(z,t+\frac{\Delta t}{2}\right)\right].
 \end{split}
 \end{equation}
+\end{subequations}
 Equation~\ref{eq:second_discrete_dD_dt} tells us the entire $\tilde{D_x}$ field at the next time step if both $\tilde{D_x}$ and $H_y$ are known at the previous time steps. Likewise, Eq.~\ref{eq:second_discrete_dH_dt} tells us the entire $H_y$ field at the next time step if $\tilde{E_x}$ and $H_y$ are known at the previous time steps. We can discretize these expressions by defining
 \begin{equation}
 \begin{aligned}
@@ -213,6 +235,7 @@ t_j&=j\Delta t
 \end{aligned}
 \end{equation}
 Which results in much more succinct expressions,
+\begin{subequations}
 \begin{align}
 \label{eq:third_discrete_dD_dt}\begin{split}
 &\tilde{D_x}(z_i,t_{j})=\tilde{D_x}(z_i,t_{j-1}) \\
@@ -223,6 +246,7 @@ Which results in much more succinct expressions,
     & -\frac{1}{2}\left[\tilde{E_x}(z_{i+1},t_j)-\tilde{E_x}(z_{i},t_j)\right].
 \end{split}
 \end{align}
+\end{subequations}
 
  However, we still need a way to find $\tilde{E_x}$ at the next timestep. For this, we return to Eq.~\ref{eq:D_time}. The discrete form of the integral is just a summation, so the discrete form of Eq.~\ref{eq:D_time} is
 \begin{equation}
@@ -238,7 +262,7 @@ By separating the $j^\mathrm{th}$ term from the rest of the summation, we see th
 This allows us to find $\tilde{E_x}(z_i,t_j)$, which is $\tilde{E}$ at the current time, from $\tilde{D_x}$ at the current time as well as $\tilde{E_x}$ at all past times,
 \begin{equation}
 \label{eq:first_discrete_E}
-\tilde{E_x}(z_i,t_j) = \frac{\tilde{D}(z_i,t_j)-\frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j-1}\tilde{E_x}(z_i,t_j)}{\epsilon_r+\frac{\sigma\Delta t}{\epsilon_0}}.
+\tilde{E_x}(z_i,t_j) = \frac{\tilde{D_x}(z_i,t_j)-\frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j-1}\tilde{E_x}(z_i,t_j)}{\epsilon_r+\frac{\sigma\Delta t}{\epsilon_0}}.
 \end{equation}
 For conciseness as well as efficiency in implementation, we will introduce
 \begin{equation}
@@ -248,13 +272,14 @@ I(z_i,t_j) = \frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n)
 This allows us to forgo the need to perform the entire summation each time, instead simply adding the newest value of $\tilde{E_x}$ each time instead.
 
 With the substitution of Eq.~\ref{eq:first_I} in Eq.~\ref{eq:first_discrete_E} alongside Eqs.~\ref{eq:third_discrete_dD_dt}~and~\ref{eq:third_discrete_dH_dt}, we arrive at the formulation of FDTD in one dimension, arranged in iterative form,
+\begin{subequations}
 \begin{empheq}[box=\fbox]{align}
 \label{eq:1D_D}\begin{split}
 &\tilde{D_x}(z_i,t_{j})=\tilde{D_x}(z_i,t_{j-1}) \\
 &   -\frac{1}{2}\left[H_y(z_{i},t_j)-H_y(z_{i-1},t_j)\right],
 \end{split} \\
 \label{eq:1D_E}
-&\tilde{E_x}(z_i,t_j) = \frac{\tilde{D}(z_i,t_j)-I(z_i,t_{j-1})}{\epsilon_r+\frac{\sigma\Delta t}{\epsilon_0}},\\
+&\tilde{E_x}(z_i,t_j) = \frac{\tilde{D_x}(z_i,t_j)-I(z_i,t_{j-1})}{\epsilon_r+\frac{\sigma\Delta t}{\epsilon_0}},\\
 \label{eq:1D_I}
 &I(z_i,t_j) = \frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n), \\
 \label{eq:1D_H}\begin{split}
@@ -262,6 +287,7 @@ With the substitution of Eq.~\ref{eq:first_I} in Eq.~\ref{eq:first_discrete_E} a
     & -\frac{1}{2}\left[\tilde{E_x}(z_{i+1},t_j)-\tilde{E_x}(z_{i},t_j)\right].
 \end{split}
 \end{empheq}
+\end{subequations}
 \section{Stability}
 The stability conditions of FDTD, unlike many numerical methods, comes from physical reasoning rather than mathematical reasoning. FDTD propagates electromagnetic waves, which clearly cannot move faster than $c_0$, the speed of light in vacuum. As such, imagine an electromagnetic wave propagating in one dimension. If the distance it travels is $\Delta x$, then the minimum time required is $\Delta t_{\textit{min}} = \Delta x/c_0$. Suppose this distance, $\Delta x$, is the length of one cell in the one-dimensional FDTD, then the timestep, $\Delta t$, must be no greater than $\Delta t_\textit{min}$. So in one dimension, $\Delta t \leq \Delta x/c_0$. Now, consider a two-dimensional FDTD, now the maximum distance the wave could travel in one cell is the diagonal of each square cell. This leads us to a requirement of $\Delta t \leq \frac{\Delta x}{c_0\sqrt{2}}$ where $\Delta x$ is the size of the cell in both spatial dimensions. This trend continues, leading us to the Courant-Friedrichs-Levy (CFL) condition~\cite{Courant28},
 \begin{equation}
@@ -274,6 +300,11 @@ For simplicity in this paper, we choose
 \Delta t = \frac{\Delta x}{2 c_0},
 \end{equation}
 which guarantees stability in one-, two-, three-, and even four-dimensional FDTD simulations. However, this is not the fastest or most efficient choice of $\Delta t$.
+
+\section{Formulation of FDTD in Two Dimensions}
+
+
+
 \bibliography{References}
 \bibliographystyle{ieeetr}
 \newpage
