@@ -288,18 +288,45 @@ With the substitution of Eq.~\ref{eq:first_I} in Eq.~\ref{eq:first_discrete_E} a
 \end{split}
 \end{empheq}
 \end{subequations}
+Again, an important observation is that only Eqs.~\ref{eq:1D_E}~and~\ref{eq:1D_I} contain information about the propagation medium. Thus, Eqs.~\ref{eq:1D_D}~and~\ref{eq:1D_H} do not change in different media.
 \section{Stability}
-The stability conditions of FDTD, unlike many numerical methods, comes from physical reasoning rather than mathematical reasoning. FDTD propagates electromagnetic waves, which clearly cannot move faster than $c_0$, the speed of light in vacuum. As such, imagine an electromagnetic wave propagating in one dimension. If the distance it travels is $\Delta x$, then the minimum time required is $\Delta t_{\textit{min}} = \Delta x/c_0$. Suppose this distance, $\Delta x$, is the length of one cell in the one-dimensional FDTD, then the timestep, $\Delta t$, must be no greater than $\Delta t_\textit{min}$. So in one dimension, $\Delta t \leq \Delta x/c_0$. Now, consider a two-dimensional FDTD, now the maximum distance the wave could travel in one cell is the diagonal of each square cell. This leads us to a requirement of $\Delta t \leq \frac{\Delta x}{c_0\sqrt{2}}$ where $\Delta x$ is the size of the cell in both spatial dimensions. This trend continues, leading us to the Courant-Friedrichs-Levy (CFL) condition~\cite{Courant28},
+The stability conditions of FDTD, unlike many numerical methods, comes from physical reasoning rather than mathematical reasoning. FDTD propagates electromagnetic waves, which clearly cannot move faster than $c_0$, the speed of light in vacuum. As such, imagine an electromagnetic wave propagating in one dimension. If the distance it travels is $\Delta x$, then the minimum time required is $\Delta t_{\textit{min}} = \Delta x/c_0$. Suppose this distance, $\Delta x$, is the length of one cell in the one-dimensional FDTD, then the timestep, $\Delta t$, must be no greater than $\Delta t_\textit{min}$. So in one dimension, $\Delta t \leq \Delta x/c_0$. Now, consider a two-dimensional FDTD, now the maximum distance the wave could travel in one cell is the diagonal of each square cell. This leads us to a requirement of $\Delta t \leq \frac{\Delta x}{c_0\sqrt{2}}$ where $\Delta x$ is the size of the cell in both spatial dimensions. This trend continues, leading us to the Courant-Friedrichs-Levy (CFL) condition for an explicit method~\cite{Courant28},
 \begin{equation}
 \Delta t \leq \frac{1}{c_0\sqrt{\sum_i\frac{1}{(\Delta x_i)^2}}},
 \end{equation}
-where the sum in the denominator is over all spatial dimensions. For example, the stability condition for a three-dimensional FDTD would be $\Delta t \leq \frac{\Delta x}{c_0\sqrt{3}}$ if the size of the cells were $\Delta x \times \Delta x \times \Delta x$.
+where the sum in the denominator is over all spatial dimensions. For example, the stability condition for a three-dimensional FDTD would be $\Delta t \leq \frac{\Delta x}{c_0\sqrt{3}}$ if the size of the cells were $\Delta x \times \Delta x \times \Delta x$. For $n$ dimensions with equal spacing,
+\begin{equation}
+\Delta t \leq \frac{\Delta x}{c_0\sqrt{n}}.
+\end{equation}
 
 For simplicity in this paper, we choose
 \begin{equation}
 \Delta t = \frac{\Delta x}{2 c_0},
 \end{equation}
 which guarantees stability in one-, two-, three-, and even four-dimensional FDTD simulations. However, this is not the fastest or most efficient choice of $\Delta t$.
+
+\section{Boundary Conditions}
+In code, we cannot simulate infinite fields. This applies not only to the one-dimensional method, but all higher dimensional methods as well. As such, we will talk about $x$ as a general spatial coordinate here, instead of $z$. Since we cannot store fields with infinite size in any computer code, there must be some finite number of $x$ values, say $N$. Then there must be some initial and final $x_i$, say $x_0$ and $x_{N-1}$ respectively. This section discusses three techniques to handle the non-existent values of $x_{-1}$ and $x_{N}$.
+\subsection{Hard Boundaries}
+One of the simplest ways to handle the boundaries is to force ${x_i=0~\mathrm{for}~i<0~\mathrm{or}~i>N-1}$. However, this results in erroneous reflections, which are not ideal~\cite{Sullivan00}.
+\subsection{Cyclic Boundaries}
+A similar, but slightly more efficient boundary condition is the cyclic boundary condition in which
+\begin{equation}
+\label{eq:cyclic}
+i=\begin{cases}
+i+N\left\lceil\left|{\frac{i}{N}}\right|\right\rceil~&\mathrm{if}~i<0,\\
+i~&\mathrm{if}~0\leq i\leq N-1,\\
+i-N\left\lfloor\left|{\frac{i}{N}}\right|\right\rfloor~&\mathrm{if}~i>N-1.
+\end{cases}
+\end{equation}
+Where $\lceil~\rceil$ and $\lfloor~\rfloor$ are the ceiling and floor functions respectively. This condition makes it so that leaving one side of the computational domain results in appearing on the other.
+
+As an example, let $N=100$ and suppose the values of $x_{128}$ and $x_{-128}$ are required. In the first case, we are in the bottom case of Eq.~\ref{eq:cyclic}, which evaluates to $i=128-100\lfloor 1.28 \rfloor=28$. Likewise, for $x_{-128}$, $i=-128+100\lceil1.28\rceil=72$. And so $x_{128}\rightarrow x_{28}$ and $x_{-128}\rightarrow x_{72}$---values that exist within the domain.
+
+In terms of erroneous propagation, this method is not necessarily any better than the previous one. Instead of erroneous reflections, now certain parts of the boundary act as sources, assuming a wave propagated through the opposing side.
+\subsection{Perfectly Matched Layer}
+
+\section{Heterogenous Media}
 
 \section{Formulation of FDTD in Two Dimensions}
 
@@ -354,7 +381,7 @@ H(t) =
     0~&\mathrm{if}~t<0
     \end{cases}.
 \end{equation}
-Noticing that $H(x)=\frac{\mathit{sgn}(t)+1}{2}$ we take the Fourier transform of $H$,
+Noticing that $H(t)=\frac{\mathit{sgn}(t)+1}{2}$ we take the Fourier transform of $H$,
 \begin{equation*}
 \begin{aligned}
 F(H(t))&=F\left(\frac{\mathit{sgn}(t)+1}{2}\right) \\
