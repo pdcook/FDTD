@@ -1,5 +1,6 @@
 \documentclass[12pt,twocolumn]{article}
 \usepackage{amsmath,amsfonts,amssymb}
+\usepackage{empheq}
 \usepackage{setspace}
 \usepackage{float}
 \usepackage{tocloft}
@@ -108,11 +109,11 @@ Finally, we express everything in Gaussian units instead of SI. The purpose for 
 \mathbf{\tilde{D}}=\sqrt{\frac{1}{\epsilon_0\mu_0}}\mathbf{D}.
 \end{align}
 This normalization yields the final set of equations that will be used to govern the propagation of electromagnetic waves in a lossy dielectric medium,
-\begin{align}
+\begin{empheq}[box=\fbox]{align}
 \label{eq:dH_dt}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\curl{\mathbf{\tilde{E}}}, \\
 \label{eq:D_time}\mathbf{\tilde{D}}(t) &= \epsilon_r \mathbf{\tilde{E}}(t)+\frac{\sigma}{\epsilon_0}\int_0^t\mathbf{\tilde{E}}(\tau)d\tau, \\
 \label{eq:dD_dt}\frac{\partial\mathbf{\tilde{D}}}{\partial t} &= \frac{1}{\sqrt{\epsilon_0\mu_0}}\curl{\mathbf{H}}.
-\end{align}
+\end{empheq}
 In these equations, the two parameters that are material-specific appear only in Eq.~\ref{eq:D_time}. Larger relative permittivities, $\epsilon_r$, decrease the strength of the electric field per unit charge, which has the effect of slowing electromagnetic waves. The dielectric conductivity, $\sigma$, represents the total dissipative effect of the material, accounting for any energy loss of the waves in the material.
 \section{Finite Difference Approximation of the Derivative}
 Let $f(x)$ be any continuous and thrice differientiable function with bounded derivatives. If we want to obtain an approximation of $f'(x)$, we start by considering $f(x+h)$ and $f(x-h)$, where $h$ is a small displacement. Theorem~\ref{thm:lagrange} in Appendix~\ref{ap:lagrange} allows us to write $f(x+h)$ and $f(x-h)$ as shown in Eq.~\ref{eq:expansions}.
@@ -177,7 +178,11 @@ We will interleave $H_y$ and $\tilde{D_x}$ both spatially and temporally. This i
 \end{strip}
 Using the central difference approximation of the derivative, Eq.~\ref{eq:approx_central_difference}, on each of the derivatives---using the same spacing as the offsets from the interleaving process, $\Delta z/2$ for the spatial stepsize and $\Delta t/2$ for the temporal stepsize---leads us to Eqs.~\ref{eq:first_discrete_dD_dt}~and~\ref{eq:first_discrete_dH_dt}.
 
-Now, we impose restrictions on $\Delta t$ and $\Delta z$ to ensure stability. A discussion including the reasoning for this is presented in the next section. By forcing $\Delta t=\Delta z/(2c_0)$ (recall $c_0=1/\sqrt{\epsilon_0\mu_0}$), we guarantee the stability of the numerical method. Using this condition and rearranging Eqs.~\ref{eq:first_discrete_dD_dt}~and~\ref{eq:first_discrete_dH_dt} into an iterative form leads to
+Now, we impose restrictions on $\Delta t$ and $\Delta z$ to ensure stability. A discussion including the reasoning for this is presented in the next section. By forcing
+\begin{equation}
+\Delta t=\frac{\Delta z}{2c_0},
+\end{equation}
+ where $c_0=1/\sqrt{\epsilon_0\mu_0}$ just as before, we guarantee the stability of the numerical method. Using this condition and rearranging Eqs.~\ref{eq:first_discrete_dD_dt}~and~\ref{eq:first_discrete_dH_dt} into an iterative form leads to
 \begin{equation}
 \label{eq:second_discrete_dD_dt}\begin{split}
 \tilde{D_x}\left(z,t+\frac{\Delta t}{2}\right)&=\tilde{D_x}\left(z,t-\frac{\Delta t}{2}\right) \\
@@ -211,21 +216,64 @@ Which results in much more succinct expressions,
 \begin{align}
 \label{eq:third_discrete_dD_dt}\begin{split}
 &\tilde{D_x}(z_i,t_{j})=\tilde{D_x}(z_i,t_{j-1}) \\
-&   -\frac{1}{2}\left[H_y(z_{i},t_j)-H_y(z_{i-1},t_j)\right].
+&   -\frac{1}{2}\left[H_y(z_{i},t_j)-H_y(z_{i-1},t_j)\right],
 \end{split} \\
 \label{eq:third_discrete_dH_dt}\begin{split}
 &H_y(z_i,t_{j+1}) =H_y(z_i,t_{j}) \\
-    & -\frac{1}{2}\left[\tilde{E_x}(z_{i+1},t_j)-\tilde{E_x}(z_{i},t_j)\right],
+    & -\frac{1}{2}\left[\tilde{E_x}(z_{i+1},t_j)-\tilde{E_x}(z_{i},t_j)\right].
 \end{split}
 \end{align}
 
  However, we still need a way to find $\tilde{E_x}$ at the next timestep. For this, we return to Eq.~\ref{eq:D_time}. The discrete form of the integral is just a summation, so the discrete form of Eq.~\ref{eq:D_time} is
 \begin{equation}
-\label{eq:first_discrete_D_time}\tilde{D_x}(t)
+\label{eq:first_discrete_D_time}\tilde{D_x}(z_i,t_j)=\epsilon_r\tilde{E_x}(z_i,t_j)+\frac{\sigma}{\epsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n)\Delta t.
 \end{equation}
+By separating the $j^\mathrm{th}$ term from the rest of the summation, we see that
+\begin{equation}
+\begin{split}
+\label{eq:second_discrete_D_time}\tilde{D_x}(z_i,t_j)&=\epsilon_r\tilde{E_x}(z_i,t_j)+ \frac{\sigma\Delta t}{\epsilon_0}\tilde{E_x}(z_i,t_j) \\
+&+\frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j-1}\tilde{E_x}(z_i,t_n).
+\end{split}
+\end{equation}
+This allows us to find $\tilde{E_x}(z_i,t_j)$, which is $\tilde{E}$ at the current time, from $\tilde{D_x}$ at the current time as well as $\tilde{E_x}$ at all past times,
+\begin{equation}
+\label{eq:first_discrete_E}
+\tilde{E_x}(z_i,t_j) = \frac{\tilde{D}(z_i,t_j)-\frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j-1}\tilde{E_x}(z_i,t_j)}{\epsilon_r+\frac{\sigma\Delta t}{\epsilon_0}}.
+\end{equation}
+For conciseness as well as efficiency in implementation, we will introduce
+\begin{equation}
+\label{eq:first_I}
+I(z_i,t_j) = \frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n).
+\end{equation}
+This allows us to forgo the need to perform the entire summation each time, instead simply adding the newest value of $\tilde{E_x}$ each time instead.
 
-
+With the substitution of Eq.~\ref{eq:first_I} in Eq.~\ref{eq:first_discrete_E} alongside Eqs.~\ref{eq:third_discrete_dD_dt}~and~\ref{eq:third_discrete_dH_dt}, we arrive at the formulation of FDTD in one dimension, arranged in iterative form,
+\begin{empheq}[box=\fbox]{align}
+\label{eq:1D_D}\begin{split}
+&\tilde{D_x}(z_i,t_{j})=\tilde{D_x}(z_i,t_{j-1}) \\
+&   -\frac{1}{2}\left[H_y(z_{i},t_j)-H_y(z_{i-1},t_j)\right],
+\end{split} \\
+\label{eq:1D_E}
+&\tilde{E_x}(z_i,t_j) = \frac{\tilde{D}(z_i,t_j)-I(z_i,t_{j-1})}{\epsilon_r+\frac{\sigma\Delta t}{\epsilon_0}},\\
+\label{eq:1D_I}
+&I(z_i,t_j) = \frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n), \\
+\label{eq:1D_H}\begin{split}
+&H_y(z_i,t_{j+1}) =H_y(z_i,t_{j}) \\
+    & -\frac{1}{2}\left[\tilde{E_x}(z_{i+1},t_j)-\tilde{E_x}(z_{i},t_j)\right].
+\end{split}
+\end{empheq}
 \section{Stability}
+The stability conditions of FDTD, unlike many numerical methods, comes from physical reasoning rather than mathematical reasoning. FDTD propagates electromagnetic waves, which clearly cannot move faster than $c_0$, the speed of light in vacuum. As such, imagine an electromagnetic wave propagating in one dimension. If the distance it travels is $\Delta x$, then the minimum time required is $\Delta t_{\textit{min}} = \Delta x/c_0$. Suppose this distance, $\Delta x$, is the length of one cell in the one-dimensional FDTD, then the timestep, $\Delta t$, must be no greater than $\Delta t_\textit{min}$. So in one dimension, $\Delta t \leq \Delta x/c_0$. Now, consider a two-dimensional FDTD, now the maximum distance the wave could travel in one cell is the diagonal of each square cell. This leads us to a requirement of $\Delta t \leq \frac{\Delta x}{c_0\sqrt{2}}$ where $\Delta x$ is the size of the cell in both spatial dimensions. This trend continues, leading us to the Courant-Friedrichs-Levy (CFL) condition~\cite{Courant28},
+\begin{equation}
+\Delta t \leq \frac{1}{c_0\sqrt{\sum_i\frac{1}{(\Delta x_i)^2}}},
+\end{equation}
+where the sum in the denominator is over all spatial dimensions. For example, the stability condition for a three-dimensional FDTD would be $\Delta t \leq \frac{\Delta x}{c_0\sqrt{3}}$ if the size of the cells were $\Delta x \times \Delta x \times \Delta x$.
+
+For simplicity in this paper, we choose
+\begin{equation}
+\Delta t = \frac{\Delta x}{2 c_0},
+\end{equation}
+which guarantees stability in one-, two-, three-, and even four-dimensional FDTD simulations. However, this is not the fastest or most efficient choice of $\Delta t$.
 \bibliography{References}
 \bibliographystyle{ieeetr}
 \newpage
