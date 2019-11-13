@@ -40,14 +40,14 @@
 \cftpagenumbersoff{figure}
 \cftpagenumbersoff{table}
 \begin{document}
-\title{A Finite Difference Time Domain Method for Two Dimensional Electromagnetic Wave Propagation In Heterogeneous Lossy Dielectric Media With Cyclic and Perfectly Matched Layer Boundary Conditions}
+\title{A Finite Difference Time Domain Method for Two Dimensional Electromagnetic Wave Propagation In Heterogeneous Lossy Dielectric Media With a Perfectly Matched Layer Boundary Condition}
 \author{Patrick D. Cook}
 \affil{Department~of~Physics,~Fort~Hays~State~University,\\Hays,~Kansas~67601,~USA}
 \date{Fall 2019}
 \begin{titlingpage}
 \maketitle
 \begin{abstract}
-In this work, the foundations behind the one- and two-dimensional finite-difference time-domain (FDTD) method in the context of electromagnetic wave propagation are presented. Heterogeneous propagation media with arbitrary dielectric constants and arbitrary electrical conductivities are considered. Two different boundary conditions, cyclic and perfectly matched layer (PML), are presented and discussed. This work includes implementations of the method using both boundary conditions, written in standard Python 3. These implementations are used to explore a variety of simple and complex geometries.
+In this work, the foundations behind the one- and two-dimensional finite-difference time-domain (FDTD) method in the context of electromagnetic wave propagation are presented. Heterogeneous propagation media with arbitrary dielectric constants and arbitrary electrical conductivities are considered. Different boundary conditions, hard boundaries, cyclic boundaries, and the perfectly matched layer (PML), are presented and discussed. This work includes implementations of the method using both cyclic and PML boundary conditions, written in standard Python 3. These implementations are used to explore a variety of simple and complex geometries.
 \end{abstract}
 
 \keywords{Electromagnetic wave simulation, finite-difference time-domain, perfectly matched layer}
@@ -325,8 +325,25 @@ As an example, let $N=100$ and suppose the values of $x_{128}$ and $x_{-128}$ ar
 
 In terms of erroneous propagation, this method is not necessarily any better than the previous one. Instead of erroneous reflections, now certain parts of the boundary act as sources, assuming a wave propagated through the opposing side.
 \subsection{Perfectly Matched Layer}
-A much more powerful boundary condition is the perfectly matched layer (PML)~\cite{Berenger94}. This is an absorbing boundary condition that allows us to imitate infinite fields.
+A much more powerful boundary condition is the perfectly matched layer (PML)~\cite{Berenger94}. This is an absorbing boundary condition that allows us to imitate infinite fields. As the waves reach the boundary, they are entirely absorbed, with no reflections. Within the domain, this is the same as if the waves were allowed to continue propagating to infinity.
 
+First, consider the reflection coefficient at the boundary between medium $A$ and medium $B$,
+\begin{equation}
+\Gamma = \frac{\eta_A-\eta_B}{\eta_A+\eta_B},
+\end{equation}
+where $\eta$ is the intrinsic impedance of either medium, given by
+\begin{equation}
+\eta=\sqrt{\frac{\mu}{\epsilon}}.
+\end{equation}
+We have considered $\mu$ to be constant for all media (with a value of $\mu_0$) in all prior discussions. However, suppose near the edge of the computational domain, a medium was placed with a specifically chosen $\mu$ such that $\Gamma=0$, hence the name ``perfectly matched layer''. Then, there would be no reflections from this medium. This solves the problem of reflections from this medium, but waves would still reflect from the boundary of the domain, if not sufficiently attenuated in this new medium. Just as in previous discussions, the conductivity, $\sigma$, represents the attenuatation of a medium. Thus, we may introduce ficticious media near the boundaries of the computational domain with specifically chosen constants $\mu$ and $\sigma$ such that they do not reflect any waves and attenutate the waves that enter them. These media are the perfectly matched layers, since their intrinsic impedance exactly matches that of the neighboring domain. Figure~\ref{fig:PML} illustrates the placement of the PML in a two-dimensional domain. It is important to note that the following discussion will be in the general three-dimensional case.
+\begin{figure}
+\centering
+\includegraphics[width=0.5\linewidth]{PML.eps}
+\caption{Placement of the PML in a two-dimensional domain. In (a), no PML is present and thus no material constants have been chosen or modified. The area marked by (b) is where the PML for the $y$ direction has been placed, waves will be attenuated in this region to prevent them from reflecting from the boundary of the domain. The PMLs in the $x$ and $y$ directions overlap in (c).}
+\label{fig:PML}
+\end{figure}
+
+\cite{Sacks95}\cite{Schneider10}
 
 \section{Heterogeneous Media}
 
