@@ -40,14 +40,14 @@
 \cftpagenumbersoff{figure}
 \cftpagenumbersoff{table}
 \begin{document}
-\title{A Finite Difference Time Domain Method for Two Dimensional Electromagnetic Wave Propagation In Lossy Dielectric Media With Cyclic and Perfectly Matched Layer Boundary Conditions}
+\title{A Finite Difference Time Domain Method for Two Dimensional Electromagnetic Wave Propagation In Heterogeneous Lossy Dielectric Media With Cyclic and Perfectly Matched Layer Boundary Conditions}
 \author{Patrick D. Cook}
 \affil{Department~of~Physics,~Fort~Hays~State~University,\\Hays,~Kansas~67601,~USA}
 \date{Fall 2019}
 \begin{titlingpage}
 \maketitle
 \begin{abstract}
-In this work, the foundations behind the one- and two-dimensional finite-difference time-domain (FDTD) method in the context of electromagnetic wave propagation are presented. Two different boundary conditions, cyclic and perfectly matched layer (PML), are presented and discussed. This work includes implementations of the method using both boundary conditions, written in standard Python 3.
+In this work, the foundations behind the one- and two-dimensional finite-difference time-domain (FDTD) method in the context of electromagnetic wave propagation are presented. Heterogeneous propagation media with arbitrary dielectric constants and arbitrary electrical conductivities are considered. Two different boundary conditions, cyclic and perfectly matched layer (PML), are presented and discussed. This work includes implementations of the method using both boundary conditions, written in standard Python 3. These implementations are used to explore a variety of simple and complex geometries.
 \end{abstract}
 
 \keywords{Electromagnetic wave simulation, finite-difference time-domain, perfectly matched layer}
@@ -326,7 +326,7 @@ As an example, let $N=100$ and suppose the values of $x_{128}$ and $x_{-128}$ ar
 In terms of erroneous propagation, this method is not necessarily any better than the previous one. Instead of erroneous reflections, now certain parts of the boundary act as sources, assuming a wave propagated through the opposing side.
 \subsection{Perfectly Matched Layer}
 
-\section{Heterogenous Media}
+\section{Heterogeneous Media}
 
 \section{Formulation of FDTD in Two Dimensions}
 
