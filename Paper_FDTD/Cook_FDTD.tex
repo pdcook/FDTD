@@ -1,5 +1,6 @@
 \documentclass[12pt,twocolumn]{article}
 \usepackage{amsmath,amsfonts,amssymb}
+\usepackage{bm}
 \usepackage{empheq}
 \usepackage{setspace}
 \usepackage{float}
@@ -61,7 +62,7 @@ This work is an overview of the derivation of the necessary expressions used in 
 The differiential form of Maxwell's equations for the electric field, $\mathbf{E}$, and magnetic field, $\mathbf{B}$, in vacuum, are~\cite{Jackson99}
 \begin{subequations}
 \begin{align}
-\div{\mathbf{E}} &= \frac{\rho}{\epsilon_0}, \\
+\div{\mathbf{E}} &= \frac{\rho}{\varepsilon_0}, \\
 \div{\mathbf{B}} &= 0, \\
 \label{eq:curl_E}\curl{\mathbf{E}}&= -\frac{\partial\mathbf{B}}{\partial t}, \\
 \label{eq:curl_B}\curl{\mathbf{B}}&= \mu_0\mathbf{J}+\frac{1}{c^2}\frac{\partial\mathbf{E}}{\partial t}.
@@ -71,42 +72,43 @@ Where
 \begin{itemize}
 \item $\rho$ is the free electric charge density
 \item $\mathbf{J}$ is the free current density
-\item $\epsilon_0$ is the permittivity of free space
+\item $\varepsilon_0$ is the permittivity of free space
 \item $\mu_0$ is the permeability of free space
-\item $c$ is the speed of light, $c\equiv\frac{1}{\sqrt{\epsilon_0\mu_0}}$
+\item $c$ is the speed of light, $c\equiv\frac{1}{\sqrt{\varepsilon_0\mu_0}}$
 \end{itemize}
-In the context of electromagnetic wave propagation, only Eqs.~\ref{eq:curl_E}~and~\ref{eq:curl_B} are of interest. Assuming there is no free current, rewriting these two equations in terms of the magnetic field strength, $\mathbf{H}=\mathbf{B}/\mu_0$, and subsituting $c\equiv\frac{1}{\sqrt{\epsilon_0\mu_0}}$ yields
+In the context of electromagnetic wave propagation, only Eqs.~\ref{eq:curl_E}~and~\ref{eq:curl_B} are of interest. Assuming there is no free current, rewriting these two equations in terms of the magnetic field strength, $\mathbf{H}=\mathbf{B}/\mu_0$, and subsituting $c\equiv\frac{1}{\sqrt{\varepsilon_0\mu_0}}$ yields
 \begin{subequations}
 \begin{align}
 \label{eq:dH_dt_vacuum}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\mu_0}\curl{\mathbf{E}}, \\
-\label{eq:dE_dt_vacuum}\epsilon_0\frac{\partial\mathbf{E}}{\partial t} &= \curl{\mathbf{H}}.
+\label{eq:dE_dt_vacuum}\varepsilon_0\frac{\partial\mathbf{E}}{\partial t} &= \curl{\mathbf{H}}.
 \end{align}
 \end{subequations}
-In a dielectric medium, we introduce the relative permittivity, $\epsilon_r$, which is material-specific. This allows us to write the permittivity as $\epsilon=\epsilon_r\epsilon_0$. We could also introduce the relative permeability, but in this work we will assume all materials are nonmagnetic, meaning $\mu_r=1$ and so $\mu=\mu_0$. Eqs.~\ref{eq:dH_dt_vacuum}~and~\ref{eq:dE_dt_vacuum} become
+In a dielectric medium, we introduce the relative permittivity, $\varepsilon_r$, which is material-specific. This allows us to write the permittivity as $\varepsilon=\varepsilon_r\varepsilon_0$. We could also introduce the relative permeability, but in this work we will assume all materials are nonmagnetic, meaning $\mu_r=1$ and so $\mu=\mu_0$. Eqs.~\ref{eq:dH_dt_vacuum}~and~\ref{eq:dE_dt_vacuum} become
 \begin{subequations}
 \begin{align}
 \frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\mu_0}\curl{\mathbf{E}}, \\
-\frac{\partial\mathbf{E}}{\partial t} &= \frac{1}{\epsilon}\curl{\mathbf{H}}.
+\frac{\partial\mathbf{E}}{\partial t} &= \frac{1}{\varepsilon}\curl{\mathbf{H}}.
 \end{align}
 \end{subequations}
 
-A more general form of these equations uses the electric displacement, $\mathbf{D}$, which can be written as $\mathbf{D}(\omega) = \epsilon_0\epsilon_r^*(\omega)\mathbf{E}(\omega)$, where $\omega$ is the frequency of the wave and $\epsilon^*_r$ is the frequency dependent dielectric constant of the medium~\cite{Sullivan00}. If we assume, for a lossy dielectric medium with relative permittivity $\epsilon_r$ and conductivity $\sigma$, that $\epsilon^*_r$ is of the form
+A more general form of these equations uses the electric displacement, $\mathbf{D}$, which can be written as $\mathbf{D}(\omega) = \varepsilon_0\varepsilon_r^*(\omega)\mathbf{E}(\omega)$, where $\omega$ is the frequency of the wave and $\varepsilon^*_r$ is the frequency dependent dielectric constant of the medium~\cite{Sullivan00}. If we assume, for a lossy dielectric medium with relative permittivity $\varepsilon_r$ and conductivity $\sigma$, that $\varepsilon^*_r$ is of the form
 \begin{equation}
-\epsilon^*_r(\omega) = \epsilon_r + \frac{\sigma}{i\omega\epsilon_0},
+\label{eq:epsilon_form}
+\varepsilon^*_r(\omega) = \varepsilon_r + \frac{\sigma}{i\omega\varepsilon_0},
 \end{equation}
 then we see that the electric displacement is
 \begin{equation}
-\mathbf{D}(\omega) = \epsilon_0\epsilon_r \mathbf{E}(\omega) + \frac{\sigma}{i\omega}\mathbf{E}(\omega).
+\mathbf{D}(\omega) = \varepsilon_0\varepsilon_r \mathbf{E}(\omega) + \frac{\sigma}{i\omega}\mathbf{E}(\omega).
 \end{equation}
-Transforming this from the frequency domain to the time domain requires an identity which is derived in Appendix~\ref{ap:fourier}. In the time domain, the above equation is
+Transforming this from the frequency domain to the time domain requires an identity which is derived in Appendix~\ref{ap:fourier1}. In the time domain, the above equation is
 \begin{equation}
-\mathbf{D}(t) = \epsilon_0\epsilon_r \mathbf{E}(t)+\sigma\int_0^t\mathbf{E}(\tau)d\tau.
+\mathbf{D}(t) = \varepsilon_0\varepsilon_r \mathbf{E}(t)+\sigma\int_0^t\mathbf{E}(\tau)d\tau.
 \end{equation}
 So that the relevant equations for electromagnetic waves are then
 \begin{subequations}
 \begin{align}
 \label{eq:dH_dt_SI}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\mu_0}\curl{\mathbf{E}}, \\
-\label{eq:D_time_SI}\mathbf{D}(t) &= \epsilon_0\epsilon_r \mathbf{E}(t)+\sigma\int_0^t\mathbf{E}(\tau)d\tau, \\
+\label{eq:D_time_SI}\mathbf{D}(t) &= \varepsilon_0\varepsilon_r \mathbf{E}(t)+\sigma\int_0^t\mathbf{E}(\tau)d\tau, \\
 \label{eq:dD_dt_SI}\frac{\partial\mathbf{D}}{\partial t} &= \curl{\mathbf{H}}.
 \end{align}
 \end{subequations}
@@ -114,19 +116,19 @@ So that the relevant equations for electromagnetic waves are then
 Finally, we express everything in Gaussian units instead of SI\@. The purpose for this is so that $E$, $D$, and $H$ are around the same order of magnitude~\cite{Sullivan00}. In Gaussian units,
 \begin{subequations}
 \begin{align}
-\mathbf{\tilde{E}}=\sqrt{\frac{\epsilon_0}{\mu_0}}\mathbf{E},\\
-\mathbf{\tilde{D}}=\sqrt{\frac{1}{\epsilon_0\mu_0}}\mathbf{D}.
+\mathbf{\tilde{E}}=\sqrt{\frac{\varepsilon_0}{\mu_0}}\mathbf{E},\\
+\mathbf{\tilde{D}}=\sqrt{\frac{1}{\varepsilon_0\mu_0}}\mathbf{D}.
 \end{align}
 \end{subequations}
 This normalization yields the final set of equations that will be used to govern the propagation of electromagnetic waves in a lossy dielectric medium,
 \begin{subequations}
 \begin{empheq}[box=\fbox]{align}
-\label{eq:dH_dt}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\curl{\mathbf{\tilde{E}}}, \\
-\label{eq:D_time}\mathbf{\tilde{D}}(t) &= \epsilon_r \mathbf{\tilde{E}}(t)+\frac{\sigma}{\epsilon_0}\int_0^t\mathbf{\tilde{E}}(\tau)d\tau, \\
-\label{eq:dD_dt}\frac{\partial\mathbf{\tilde{D}}}{\partial t} &= \frac{1}{\sqrt{\epsilon_0\mu_0}}\curl{\mathbf{H}}.
+\label{eq:dH_dt}\frac{\partial\mathbf{H}}{\partial t} &= -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\curl{\mathbf{\tilde{E}}}, \\
+\label{eq:D_time}\mathbf{\tilde{D}}(t) &= \varepsilon_r \mathbf{\tilde{E}}(t)+\frac{\sigma}{\varepsilon_0}\int_0^t\mathbf{\tilde{E}}(\tau)d\tau, \\
+\label{eq:dD_dt}\frac{\partial\mathbf{\tilde{D}}}{\partial t} &= \frac{1}{\sqrt{\varepsilon_0\mu_0}}\curl{\mathbf{H}}.
 \end{empheq}
 \end{subequations}
-In these equations, the two parameters that are material-specific appear only in Eq.~\ref{eq:D_time}. Larger relative permittivities, $\epsilon_r$, decrease the strength of the electric field per unit charge, which has the effect of slowing electromagnetic waves. The dielectric conductivity, $\sigma$, represents the total dissipative effect of the material, accounting for any energy loss of the waves in the material.
+In these equations, the two parameters that are material-specific appear only in Eq.~\ref{eq:D_time}. Larger relative permittivities, $\varepsilon_r$, decrease the strength of the electric field per unit charge, which has the effect of slowing electromagnetic waves. The dielectric conductivity, $\sigma$, represents the total dissipative effect of the material, accounting for any energy loss of the waves in the material.
 \section{Finite Difference Approximation of the Derivative}
 Let $f(x)$ be any continuous and thrice differientiable function with bounded derivatives. If we want to obtain an approximation of $f'(x)$, we start by considering $f(x+h)$ and $f(x-h)$, where $h$ is a small displacement. Theorem~\ref{thm:lagrange} in Appendix~\ref{ap:lagrange} allows us to write $f(x+h)$ and $f(x-h)$ as shown in Eq.~\ref{eq:expansions}.
 \vspace{-20pt}
@@ -172,27 +174,27 @@ This is known as the central difference approximation of the derivative. Due to 
 For example purposes, a formulation of the FDTD method in one dimension is presented here. First, we must choose an axis of propagation. Arbitrarily, suppose the wave travels only in the $\hat{z}$ direction. Eqs.~\ref{eq:dH_dt}~and~\ref{eq:dD_dt} become
 \begin{subequations}
 \begin{align}
-\frac{\partial H_y}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}, \\
-\frac{\partial \tilde{D_x}}{\partial t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial H_y}{\partial z}.
+\frac{\partial H_y}{\partial t} &= -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}, \\
+\frac{\partial \tilde{D_x}}{\partial t} &= -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\partial H_y}{\partial z}.
 \end{align}
 \end{subequations}
 We will interleave $H_y$ and $\tilde{D_x}$ both spatially and temporally. This is one of the fundamental features of the FDTD method~\cite{Sullivan00}. To interleave the two fields, we evaluate them---as well as their derivatives---offset from one another by $\Delta z/2$ in space and $\Delta t/2$ in time,
 \begin{subequations}
 \begin{equation}
-\label{eq:offset_dD_dt}\frac{\partial \tilde{D_x}}{\partial t}(z, t) = -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial H_y}{\partial z}(z, t)
+\label{eq:offset_dD_dt}\frac{\partial \tilde{D_x}}{\partial t}(z, t) = -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\partial H_y}{\partial z}(z, t)
 \end{equation}
 \vspace{-65pt}
 \begin{strip}
 \begin{equation}
-\label{eq:offset_dH_dt}\frac{\partial H_y}{\partial t}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right) = -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right)
+\label{eq:offset_dH_dt}\frac{\partial H_y}{\partial t}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right) = -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right)
 \end{equation}
 \end{strip}
 \end{subequations}
 \begin{subequations}
 \begin{strip}
 \begin{align}
-\label{eq:first_discrete_dD_dt}\frac{\tilde{D_x}\left(z,t+\frac{\Delta t}{2}\right)-\tilde{D_x}\left(z,t-\frac{\Delta t}{2}\right)}{\Delta t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{H_y\left(z+\frac{\Delta z}{2},t\right)-H_y\left(z-\frac{\Delta z}{2},t\right)}{\Delta z} \\
-\label{eq:first_discrete_dH_dt}\frac{H_y\left(z+\frac{\Delta z}{2},t+\Delta t\right)-H_y\left(z+\frac{\Delta z}{2},t\right)}{\Delta t} &= -\frac{1}{\sqrt{\epsilon_0\mu_0}}\frac{\tilde{E_x}\left(z+\Delta z,t+\frac{\Delta t}{2}\right)-\tilde{E_x}\left(z,t+\frac{\Delta t}{2}\right)}{\Delta z}
+\label{eq:first_discrete_dD_dt}\frac{\tilde{D_x}\left(z,t+\frac{\Delta t}{2}\right)-\tilde{D_x}\left(z,t-\frac{\Delta t}{2}\right)}{\Delta t} &= -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{H_y\left(z+\frac{\Delta z}{2},t\right)-H_y\left(z-\frac{\Delta z}{2},t\right)}{\Delta z} \\
+\label{eq:first_discrete_dH_dt}\frac{H_y\left(z+\frac{\Delta z}{2},t+\Delta t\right)-H_y\left(z+\frac{\Delta z}{2},t\right)}{\Delta t} &= -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\tilde{E_x}\left(z+\Delta z,t+\frac{\Delta t}{2}\right)-\tilde{E_x}\left(z,t+\frac{\Delta t}{2}\right)}{\Delta z}
 \end{align}
 \end{strip}
 \end{subequations}
@@ -202,7 +204,7 @@ Now, we impose restrictions on $\Delta t$ and $\Delta z$ to ensure stability. A 
 \begin{equation}
 \Delta t=\frac{\Delta z}{2c_0},
 \end{equation}
- where $c_0=1/\sqrt{\epsilon_0\mu_0}$ just as before, we guarantee the stability of the numerical method. Using this condition and rearranging Eqs.~\ref{eq:first_discrete_dD_dt}~and~\ref{eq:first_discrete_dH_dt} into an iterative form leads to
+ where $c_0=1/\sqrt{\varepsilon_0\mu_0}$ just as before, we guarantee the stability of the numerical method. Using this condition and rearranging Eqs.~\ref{eq:first_discrete_dD_dt}~and~\ref{eq:first_discrete_dH_dt} into an iterative form leads to
 \begin{subequations}
 \begin{equation}
 \label{eq:second_discrete_dD_dt}\begin{split}
@@ -250,24 +252,24 @@ Which results in much more succinct expressions,
 
  However, we still need a way to find $\tilde{E_x}$ at the next timestep. For this, we return to Eq.~\ref{eq:D_time}. The discrete form of the integral is just a summation, so the discrete form of Eq.~\ref{eq:D_time} is
 \begin{equation}
-\label{eq:first_discrete_D_time}\tilde{D_x}(z_i,t_j)=\epsilon_r\tilde{E_x}(z_i,t_j)+\frac{\sigma}{\epsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n)\Delta t.
+\label{eq:first_discrete_D_time}\tilde{D_x}(z_i,t_j)=\varepsilon_r\tilde{E_x}(z_i,t_j)+\frac{\sigma}{\varepsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n)\Delta t.
 \end{equation}
 By separating the $j^\mathrm{th}$ term from the rest of the summation, we see that
 \begin{equation}
 \begin{split}
-\label{eq:second_discrete_D_time}\tilde{D_x}(z_i,t_j)&=\epsilon_r\tilde{E_x}(z_i,t_j)+ \frac{\sigma\Delta t}{\epsilon_0}\tilde{E_x}(z_i,t_j) \\
-&+\frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j-1}\tilde{E_x}(z_i,t_n).
+\label{eq:second_discrete_D_time}\tilde{D_x}(z_i,t_j)&=\varepsilon_r\tilde{E_x}(z_i,t_j)+ \frac{\sigma\Delta t}{\varepsilon_0}\tilde{E_x}(z_i,t_j) \\
+&+\frac{\sigma\Delta t}{\varepsilon_0}\sum_{n=0}^{j-1}\tilde{E_x}(z_i,t_n).
 \end{split}
 \end{equation}
 This allows us to find $\tilde{E_x}(z_i,t_j)$, which is $\tilde{E}$ at the current time, from $\tilde{D_x}$ at the current time as well as $\tilde{E_x}$ at all past times,
 \begin{equation}
 \label{eq:first_discrete_E}
-\tilde{E_x}(z_i,t_j) = \frac{\tilde{D_x}(z_i,t_j)-\frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j-1}\tilde{E_x}(z_i,t_j)}{\epsilon_r+\frac{\sigma\Delta t}{\epsilon_0}}.
+\tilde{E_x}(z_i,t_j) = \frac{\tilde{D_x}(z_i,t_j)-\frac{\sigma\Delta t}{\varepsilon_0}\sum_{n=0}^{j-1}\tilde{E_x}(z_i,t_j)}{\varepsilon_r+\frac{\sigma\Delta t}{\varepsilon_0}}.
 \end{equation}
 For conciseness as well as efficiency in implementation, we will introduce
 \begin{equation}
 \label{eq:first_I}
-I(z_i,t_j) = \frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n).
+I(z_i,t_j) = \frac{\sigma\Delta t}{\varepsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n).
 \end{equation}
 This allows us to forgo the need to perform the entire summation each time, instead simply adding the newest value of $\tilde{E_x}$ each time instead.
 
@@ -279,9 +281,9 @@ With the substitution of Eq.~\ref{eq:first_I} in Eq.~\ref{eq:first_discrete_E} a
 &   -\frac{1}{2}\left[H_y(z_{i},t_j)-H_y(z_{i-1},t_j)\right],
 \end{split} \\
 \label{eq:1D_E}
-&\tilde{E_x}(z_i,t_j) = \frac{\tilde{D_x}(z_i,t_j)-I(z_i,t_{j-1})}{\epsilon_r+\frac{\sigma\Delta t}{\epsilon_0}},\\
+&\tilde{E_x}(z_i,t_j) = \frac{\tilde{D_x}(z_i,t_j)-I(z_i,t_{j-1})}{\varepsilon_r+\frac{\sigma\Delta t}{\varepsilon_0}},\\
 \label{eq:1D_I}
-&I(z_i,t_j) = \frac{\sigma\Delta t}{\epsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n), \\
+&I(z_i,t_j) = \frac{\sigma\Delta t}{\varepsilon_0}\sum_{n=0}^{j}\tilde{E_x}(z_i,t_n), \\
 \label{eq:1D_H}\begin{split}
 &H_y(z_i,t_{j+1}) =H_y(z_i,t_{j}) \\
     & -\frac{1}{2}\left[\tilde{E_x}(z_{i+1},t_j)-\tilde{E_x}(z_{i},t_j)\right].
@@ -333,9 +335,9 @@ First, consider the reflection coefficient at the boundary between medium $A$ an
 \end{equation}
 where $\eta$ is the intrinsic impedance of either medium, given by
 \begin{equation}
-\eta=\sqrt{\frac{\mu}{\epsilon}}.
+\eta=\sqrt{\frac{\mu}{\varepsilon}}.
 \end{equation}
-We have considered $\mu$ to be constant for all media (with a value of $\mu_0$) in all prior discussions. However, suppose near the edge of the computational domain, a medium was placed with a specifically chosen $\mu$ such that $\Gamma=0$, hence the name ``perfectly matched layer''. Then, there would be no reflections from this medium. This solves the problem of reflections from this medium, but waves would still reflect from the boundary of the domain, if not sufficiently attenuated in this new medium. Just as in previous discussions, the conductivity, $\sigma$, represents the attenuatation of a medium. Thus, we may introduce ficticious media near the boundaries of the computational domain with specifically chosen constants $\mu$ and $\sigma$ such that they do not reflect any waves and attenutate the waves that enter them. These media are the perfectly matched layers, since their intrinsic impedance exactly matches that of the neighboring domain. Figure~\ref{fig:PML} illustrates the placement of the PML in a two-dimensional domain. It is important to note that the following discussion will be in the general three-dimensional case.
+We have considered $\mu$ to be constant for all media (with a value of $\mu_0$) in all prior discussions. However, suppose near the edge of the computational domain, a medium was placed with a specifically chosen $\mu$ such that $\Gamma=0$, hence the name ``perfectly matched layer''. Then, there would be no reflections from this medium. This solves the problem of reflections from this medium, but waves would still reflect from the boundary of the domain, if not sufficiently attenuated in this new medium. Just as in previous discussions, the conductivity, $\sigma$, represents the attenuatation of a medium. Thus, we may introduce fictitious media near the boundaries of the computational domain with specifically chosen constants $\mu$ and $\sigma$ such that they do not reflect any waves and attenutate the waves that enter them. These media are the perfectly matched layers, since their intrinsic impedance exactly matches that of the neighboring domain. Figure~\ref{fig:PML} illustrates the placement of the PML in a two-dimensional domain. It is important to note that the following discussion will be in the general three-dimensional case.
 \begin{figure}
 \centering
 \includegraphics[width=0.5\linewidth]{PML.eps}
@@ -343,7 +345,92 @@ We have considered $\mu$ to be constant for all media (with a value of $\mu_0$) 
 \label{fig:PML}
 \end{figure}
 
-\cite{Sacks95}\cite{Schneider10}
+To create these PMLs, we introduce fictitious dielectric constants and permeabilities---in the same form as before---for each direction, which are functions of position in any spatial direction, $r\in\{x,y,z\}$,
+\begin{equation}
+\label{eq:fictitious}
+\begin{aligned}
+\varepsilon_{Fm}^*(r) &= \varepsilon_{Fm}(r)+\frac{\sigma_{Dm}(r)}{i\omega\varepsilon_0},\\
+\mu_{Fm}^*(r) &= \mu_{Fm}(r)+\frac{\sigma_{Hm}(r)}{i\omega\mu_0},\\
+\mathrm{for}&~m\in\{x,y,z\},
+\end{aligned}
+\end{equation}
+where $\sigma_{Dm}$ denotes the electric conductivity in the $m$ direction, and $\sigma_{Hm}$ denotes the magnetic conductivity in the $m$ direction. Note that $m$ and $r$ are independent. The spatial dependence is denoted by $r$, which can be any of the three spatial coordinates $\{x,y,z\}$. However, $m$ denotes the direction that the constant applies in. For example, $\varepsilon_{Fx}^*(y)$ denotes the $x$-axis dielectric constant as a function of $y$, which may change with $y$, but not with $x$ or $z$. It is very important to note that $\varepsilon_{Fm}^*$ and $\mu_{Fm}^*$ have nothing at all to do with $\varepsilon_r^*$, introduced in Eq.~\ref{eq:epsilon_form}, the relative permittivity of the propagation medium. These fictitious constants only apply in the PMLs, which reside near the boundaries of the computational domain.
+
+We introduce $\bm{\varepsilon_F^*}(\mathbf{r})$ and $\bm{\mu_F^*}(\mathbf{r})$, which are functions of three-dimensional position, $\mathbf{r}$,
+\renewcommand{\arraystretch}{1.75}
+\begin{subequations}
+\begin{equation}
+\bm{\varepsilon_F^*}=\begin{bmatrix}
+\varepsilon_{Fx}^*(x)\cdot\varepsilon_{Fx}^*(y)\cdot\varepsilon_{Fx}^*(z)\\
+\varepsilon_{Fy}^*(x)\cdot\varepsilon_{Fy}^*(y)\cdot\varepsilon_{Fy}^*(z)\\
+\varepsilon_{Fz}^*(x)\cdot\varepsilon_{Fz}^*(y)\cdot\varepsilon_{Fz}^*(z)
+\end{bmatrix},
+\end{equation}
+\begin{equation}
+\bm{\mu_F^*}=\begin{bmatrix}
+\mu_{Fx}^*(x)\cdot\mu_{Fx}^*(y)\cdot\mu_{Fx}^*(z)\\
+\mu_{Fy}^*(x)\cdot\mu_{Fy}^*(y)\cdot\mu_{Fy}^*(z)\\
+\mu_{Fz}^*(x)\cdot\mu_{Fz}^*(y)\cdot\mu_{Fz}^*(z)
+\end{bmatrix}.
+\end{equation}
+\end{subequations}
+Which, after transforming Eqs.~\ref{eq:dH_dt},~\ref{eq:D_time},~and~\ref{eq:dD_dt} to the frequency domain---which requires identities derived in Appendices~\ref{ap:fourier1}~and~\ref{ap:fourier2}---allows us to write
+\begin{subequations}
+\begin{empheq}[box=\fbox]{align}
+\label{eq:PML_dH_dt}i\omega\bm{\mu_F^*}\odot&\mathbf{H}(\omega) = -c_0\curl{\mathbf{\tilde{E}}(\omega)},\\
+\label{eq:PML_dD_dt}i\omega\bm{\varepsilon_F^*}\odot&\mathbf{\tilde{D}}(\omega) = c_0\curl{\mathbf{H}(\omega)},\\
+\label{eq:PML_D_time}\mathbf{\tilde{D}}(\omega) &= \varepsilon_r(\omega)\mathbf{\tilde{E}}(\omega) + \frac{\sigma}{i\omega\varepsilon_0}\mathbf{\tilde{E}}(\omega).
+\end{empheq}
+\end{subequations}
+Where $\odot$ denotes the Hadamard product (elementwise product). This is the restatement of Maxwell's equations in the context of a PML\@. As before, only Eq.~\ref{eq:PML_D_time} contains information about the propagation medium. However, this time Eqs.~\ref{eq:PML_dH_dt}~and~\ref{eq:PML_dD_dt} are the only equations to contain information about the PML\@.
+
+There are two restrictions for these fictitious constants to form a PML~\cite{Sacks95},
+\begin{enumerate}
+\item The impedance must be constant across the boundary of the PML,
+\begin{equation}
+\eta_0=\eta_m=\sqrt{\frac{\mu_{Fm}^*(r)}{\varepsilon_{Fm}^*(r)}},
+\end{equation}
+where $\eta_0$ is the impedance of the non-PML domain, shown as (a) in Fig.~\ref{fig:PML}. Since we are working in Gaussian units~\cite{Sullivan00,Kitano06},
+\begin{equation}
+\eta_0=1.
+\end{equation}
+\item The constants for the directions perpendicular to the boundary must be the inverse of the constants in the transverse directions,
+\begin{equation}
+\begin{aligned}
+\label{eq:condition2}
+\varepsilon_{Fm_\perp}^*(r)&=\frac{1}{\varepsilon_{Fm_\parallel}^*(r)}~\forall m_\parallel,\\
+\mu_{Fm_\perp}^*(r)&=\frac{1}{\mu_{Fm_\parallel}^*(r)}~\forall m_\parallel.
+\end{aligned}
+\end{equation}
+Where $m_\perp$ denotes the direction of perpendicular to the boundary and $m_\parallel$ denotes all of the directions parallel to the boundary. For example, in region (b) in Fig.~\ref{fig:PML}, the direction perpendicular to the boundary is $m_\perp=y$, and the transverse direction in the two-dimensional case would be $m_\parallel=x$ (in the three-dimensional case we would also need to include the $m_\parallel=z$ direction). So for this example, $\varepsilon_{Fy}^*(r)=1/\varepsilon_{Fx}^*(r)$ and $\mu_{Fy}^*(r)=1/\mu_{Fx}^*(r)$.
+\end{enumerate}
+To satisfy both of these conditions, we may choose, for all of the parallel coordinates,
+\begin{equation}
+\begin{aligned}
+\varepsilon_{Fm_\parallel}(r)&=\mu_{Fm_\parallel}(r)=1,\\
+\sigma_{Dm_\parallel}(r) &= \sigma_{m_\parallel}(r),\\
+\sigma_{Hm_\parallel}(r) &= \frac{\mu_0}{\varepsilon_0}\sigma_{m_\parallel}(r).
+\end{aligned}
+\end{equation}
+Substituting this into Eq.~\ref{eq:fictitious} and using Eq.~\ref{eq:condition2} to find the constants in the perpendicular direction yields
+\begin{subequations}
+\begin{align}
+&\left\{
+\begin{aligned}
+\varepsilon_{Fm_\parallel}^*(r)&=1+\frac{\sigma_{m_\parallel}(r)}{i\omega\varepsilon_0}\\
+\mu_{Fm_\parallel}^*(r)&=1+\frac{\sigma_{m_\parallel}(r)}{i\omega\varepsilon_0}
+\end{aligned}\right.,\\
+&\left\{
+\begin{aligned}
+\varepsilon_{Fm_\perp}^*(r)&=\left(1+\frac{\sigma_{m_\perp}(r)}{i\omega\varepsilon_0}\right)^{-1}\\
+\mu_{Fm_\perp}^*(r)&=\left(1+\frac{\sigma_{m_\perp}(r)}{i\omega\varepsilon_0}\right)^{-1}
+\end{aligned}\right..
+\end{align}
+\end{subequations}
+Which clearly satisfies both conditions.
+
+Now, if we increase $\sigma$
+
 
 \section{Heterogeneous Media}
 
@@ -357,11 +444,11 @@ We have considered $\mu$ to be constant for all media (with a value of $\mu_0$) 
 \onecolumn
 \appendix
 \section{Inverse Fourier Transform of $E(\omega)/i\omega$}
-\label{ap:fourier}
+\label{ap:fourier1}
 
 First, we must develop some Fourier transforms of useful functions. Starting with the constant function, $x(t)=a$. Instead of directly evaluating the transform, we instead look at the inverse transform of $X(\omega)$,
 \begin{equation*}
-F^{-1}(X(\omega))=x(t)=a=\frac{1}{2\pi}\int_{-\infty}^{\infty}X(\omega)e^{i\omega t}d\omega.
+\mathcal{F}^{-1}(X(\omega))=x(t)=a=\frac{1}{2\pi}\int_{-\infty}^{\infty}X(\omega)e^{i\omega t}d\omega.
 \end{equation*}
 Clearly, then $X(\omega)$ must be $2\pi a\delta(\omega)$. So,
 \begin{equation}
@@ -383,8 +470,8 @@ Which has the property
 Taking the Fourier transform of this function follows, using integration by parts
 \begin{equation*}
 \begin{aligned}
-F(\mathit{sgn}(t))&= \int_{-\infty}^{\infty}\mathit{sgn}(t)e^{-i\omega t}dt \\
-&= \left[\frac{-1}{i\omega}\mathit{sgn}(t)e^{-i\omega t}\right]_{-\infty}^{\infty} - \int_{-\infty}^{\infty}\frac{-2}{i\omega}\delta(t)e^{-i\omega t}dt \\
+\mathcal{F}(\mathit{sgn}(t))&= \int_{-\infty}^{\infty}\mathit{sgn}(t)e^{-i\omega t}dt \\
+&= \left.\frac{-1}{i\omega}\mathit{sgn}(t)e^{-i\omega t}\right|_{-\infty}^{\infty} - \int_{-\infty}^{\infty}\frac{-2}{i\omega}\delta(t)e^{-i\omega t}dt \\
 &= \frac{2}{i\omega}.
 \end{aligned}
 \end{equation*}
@@ -403,8 +490,8 @@ H(t) =
 Noticing that $H(t)=\frac{\mathit{sgn}(t)+1}{2}$ we take the Fourier transform of $H$,
 \begin{equation*}
 \begin{aligned}
-F(H(t))&=F\left(\frac{\mathit{sgn}(t)+1}{2}\right) \\
-&=F\left(\frac{\mathit{sgn}(t)}{2}\right)+F\left(\frac{1}{2}\right) \\
+\mathcal{F}(H(t))&=\mathcal{F}\left(\frac{\mathit{sgn}(t)+1}{2}\right) \\
+&=\mathcal{F}\left(\frac{\mathit{sgn}(t)}{2}\right)+\mathcal{F}\left(\frac{1}{2}\right) \\
 &= \frac{1}{i\omega}+\pi\delta(\omega).
 \end{aligned}
 \end{equation*}
@@ -421,13 +508,13 @@ This can be expressed as a convolution integral with the Heaviside function,
 \begin{equation}
 f(t)=\int_{-\infty}^{t}g(\tau)d\tau = \int_{-\infty}^{\infty}g(\tau)H(t-\tau)d\tau=(g*H)(t).
 \end{equation}
-Fourier's convolution theorem states that for any two functions, $\theta(t)$ and $\phi(t)$, whose Fourier transforms exist,
+Fourier's convolution theorem states that for any two functions, $\theta(t)$ and $\varphi(t)$, whose Fourier transforms exist,
 \begin{equation}
-F((\theta*\phi)(t)) = \Theta(\omega)\Phi(\omega).
+\mathcal{F}((\theta*\phi)(t)) = \Theta(\omega)\varPhi(\omega).
 \end{equation}
 Applying this to our function, $f(t)$, yields,
 \begin{equation}
-F(f(t)) = G(\omega)\left[\frac{1}{i\omega}+\pi\delta(\omega)\right].
+\mathcal{F}(f(t)) = G(\omega)\left[\frac{1}{i\omega}+\pi\delta(\omega)\right].
 \end{equation}
 So,
 \begin{equation}
@@ -437,10 +524,25 @@ Finally, we can use this identity to find $\mathbf{E}(t)$, given $\mathbf{E}(\om
 \begin{equation}
 \int_{-\infty}^{t}\mathbf{E}(\tau)d\tau\rightleftharpoons \mathbf{E}(\omega)\left[\frac{1}{i\omega}+\pi\delta(\omega)\right].
 \end{equation}
-We may assume that $\mathbf{E}(t)$ is zero for $t<0$ and $\mathbf{E}(\omega=0)=0$, in which case the above equation reduces to the desired identity,
+We may assume that $\mathbf{E}(t)$ is zero for $t<0$ and $\lim_{\omega\rightarrow 0}\mathbf{E}(\omega)=0$, in which case the above equation reduces to the desired identity,
 \begin{equation}
 \int_0^t\mathbf{E}(\tau)d\tau\rightleftharpoons \frac{\mathbf{E}(\omega)}{i\omega}.
 \end{equation}
+\newpage
+\section{Fourier Transform of $df/dt$}
+\label{ap:fourier2}
+Given a function $f(t)$ and its Fourier transform $F(\omega)$ with the condition $\lim_{t\rightarrow 0}f(t) = 0$, the Fourier transform of its first derivative, $df/dt$ is found with integration by parts,
+\begin{align*}
+\mathcal{F}\left(\frac{df}{dt}(t)\right) &= \int_{-\infty}^{\infty}\frac{df}{dt}(t)e^{-i\omega t}dt \\
+& = \left.f(t)e^{-i\omega t}\right|_{-\infty}^{\infty} + \int_{-\infty}^{\infty}f(t)i\omega e^{-i\omega t}dt\\
+& = i\omega \int_{-\infty}^{\infty}f(t)e^{-i\omega t}dt\\
+& = i\omega F(\omega).
+\end{align*}
+Which is the identity,
+\begin{equation}
+\frac{df}{dt}(t) \rightleftharpoons i\omega F(\omega).
+\end{equation}
+
 \newpage
 \section{The Lagrange Remainder Theorem}
 \label{ap:lagrange}
