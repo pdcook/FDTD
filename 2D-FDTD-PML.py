@@ -100,13 +100,13 @@ def FDTD2D(media,pulse,Nt,PMLSize = 5):
         Iz[ti] = Iz[ti-1] + Gbz*Ez[ti]
 
         # calculate magnetic field
-        curl_e = np.roll(Ez[ti],1,axis=1) - Ez[ti]
-        Ihy[ti] = Ihy[ti-1] + curl_e
-        Hy[ti] = fx3*Hy[ti-1] + 0.5*fx2*curl_e + fy1*Ihy[ti]
+        dxE     = np.roll(Ez[ti],1,axis=1) - Ez[ti]
+        Ihy[ti] = Ihy[ti-1] + dxE
+        Hy[ti]  = fx3*Hy[ti-1] + 0.5*fx2*dxE + fy1*Ihy[ti]
 
-        curl_e = Ez[ti] - np.roll(Ez[ti],1,axis=0)
-        Ihx[ti] = Ihx[ti-1] + curl_e
-        Hx[ti] = fy3*Hx[ti-1] + 0.5*fy2*curl_e + fx1*Ihx[ti]
+        dyE     = np.roll(Ez[ti],1,axis=0) - Ez[ti]
+        Ihx[ti] = Ihx[ti-1] - dyE
+        Hx[ti]  = fy3*Hx[ti-1] - 0.5*fy2*dyE + fx1*Ihx[ti]
 
     # return arrays
     return Ez, Dz, Hx, Hy
