@@ -33,7 +33,7 @@ def FDTD2D(media,pulse,Nt):
     Ez  = np.zeros((Nt,Ny,Nx)) # electric field
     Hx  = np.zeros((Nt,Ny,Nx)) # magnetic field
     Hy  = np.zeros((Nt,Ny,Nx)) # magnetic field
-    Iz  = np.zeros((Nt,Ny,Nx))
+    Iz  = np.zeros((Nt,Ny,Nx)) # integral of Ez
 
     # read in the coefficient arrays for the media
     if np.isscalar(media.Gaz) and np.isscalar(media.Gbz):
@@ -58,7 +58,7 @@ def FDTD2D(media,pulse,Nt):
         # calculate electric field
         Ez[ti] = Gaz*(Dz[ti]-Iz[ti-1])
 
-        # calculate ???
+        # calculate integral of Ez
         Iz[ti] = Iz[ti-1] + Gbz*Ez[ti]
 
         # calculate magnetic field
