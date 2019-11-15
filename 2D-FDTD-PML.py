@@ -230,6 +230,9 @@ def Animate(F, excludePML = 0, cmin = None, cmax = None):
     plt.show()
 
 def Energy(Ez,Hx,Hy):
+    """
+        Calculate the energy in the domain
+    """
     Nt, Ny, Nx = Ez.shape
     E_Ez = np.sum(Ez**2, axis=(1,2))
     E_Hx = np.sum(Hx**2, axis=(1,2))
