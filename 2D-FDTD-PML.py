@@ -1,6 +1,19 @@
 #!/bin/env python3
 
-# 2D FDTD without PML
+#=============================================================================#
+"""
+This software is a minimum working example of the 2D FDTD method with PML
+as described in the accompanying paper by P. D. Cook.
+
+This program was written for Python 3.7.5.
+
+This software is being provided "as is", without any express or implied
+warranty. In particular, the authors do not make any representation or
+warranty of any kind concerning the merchantability of this software or its
+fitness for any particular purpose.
+"""
+#=============================================================================#
+
 
 import numpy as np
 import matplotlib.pyplot as plt
