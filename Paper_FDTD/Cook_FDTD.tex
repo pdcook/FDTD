@@ -1,4 +1,5 @@
 \documentclass[12pt,twocolumn]{article}
+\usepackage{minted}
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{bm}
 \usepackage{empheq}
@@ -48,7 +49,7 @@
 \begin{titlingpage}
 \maketitle
 \begin{abstract}
-In this work, the foundations behind the one- and two-dimensional finite-difference time-domain (FDTD) method in the context of electromagnetic wave propagation are presented. Heterogeneous propagation media with arbitrary dielectric constants and arbitrary electrical conductivities are considered. Different boundary conditions, hard boundaries, cyclic boundaries, and the perfectly matched layer (PML), are presented and discussed. This work includes implementations of the method using both cyclic and PML boundary conditions, written in standard Python 3. These implementations are used to explore a variety of simple and complex geometries.
+In this work, the foundations behind the one- and two-dimensional finite-difference time-domain (FDTD) method in the context of electromagnetic wave propagation are presented. Heterogeneous propagation media with arbitrary dielectric constants and arbitrary electrical conductivities are considered. Different boundary conditions, hard boundaries, cyclic boundaries, and the perfectly matched layer (PML), are presented and discussed. This work include an implementation of the method using the PML boundary condition, written in standard Python 3. This implementations is used to explore a variety of simple and complex geometries.
 \end{abstract}
 
 \keywords{Electromagnetic wave simulation, finite-difference time-domain, perfectly matched layer}
@@ -497,14 +498,105 @@ Since the waves will propagate in the $xy$-plane, there is no $z$ dependence in 
 
 \noindent We note again the important fact that Eq.~\ref{eq:2D_TM_Dz_w_E} is the only part of this formulation to contain information about the propgation medium. All other parts, Eqs.~\ref{eq:2D_TM_Hx_w},~\ref{eq:2D_TM_Hy_w},~and~\ref{eq:2D_TM_Dz_w_H}, only contain information about propagation in free space and the PML.
 
-Now, we transform these expressions to the time-domain, treating Eq.~\ref{eq:2D_TM_Dz_w_E} exactly as in previous discussions,
-\begin{strip}
+We define discrete variables just as before,
+\begin{equation}
+\begin{aligned}
+&\left\{
+\begin{split}
+x_i&=i\Delta x \\
+y_j&=j\Delta x \\
+t_k&=\left(k+\frac{1}{2}\right)\Delta t
+\end{split}\right.~~&~\mathrm{for}~\tilde{E_z}~\mathrm{and}~\tilde{D_z}, \\
+&\left\{
+\begin{split}
+x_i&=\left(i+\frac{1}{2}\right)\Delta x \\
+y_j&=\left(j+\frac{1}{2}\right)\Delta x \\
+t_k&=k\Delta t
+\end{split}\right.~~&~\mathrm{for}~H_x~\mathrm{and}~H_y,\\
+&\left\{
+\begin{split}
+x_i&=i\Delta x \\
+y_j&=j\Delta x 
+\end{split}\right.~~&\mathrm{for}~\varepsilon_r,~\sigma~\mathrm{and},~\sigma_D.
+\end{aligned}
+\end{equation}
+Using this, we discretize Eqs.~\ref{eq:2D_TM_Hx_w},~\ref{eq:2D_TM_Hy_w},~\ref{eq:2D_TM_Dz_w_H},~and~\ref{eq:2D_TM_Dz_w_E} and transform them to the time-domain\footnote{See Appendix~\ref{ap:Sullivan} for explaination on why so many steps were skipped here.}, treating Eq.~\ref{eq:2D_TM_Dz_w_E} exactly as in previous discussions. To save space, we first introduce,
 \begin{subequations}
 \begin{align}
+&\begin{aligned}
+\partial_x\tilde{E_z}(x_i,y_i,t_k) &= \tilde{E_z}(x_{i+1},y_j,t_k)\\&-\tilde{E_z}(x_i,y_j,t_k),
+\end{aligned}\\
+&\begin{aligned}
+\partial_y\tilde{E_z}(x_i,y_i,t_k) &= \tilde{E_z}(x_i,y_{j+1},t_k)\\&-\tilde{E_z}(x_i,y_j,t_k),
+\end{aligned}\\
+&\begin{aligned}
+I_{z}(x_i,y_i,t_k) &= \frac{\sigma(x_i,y_j)\Delta t}{\varepsilon_0}\sum_{n=0}^k\tilde{E_z}(x_i,y_j,t_n),
+\end{aligned}\\
+&\begin{aligned}
+I_{H_x}(x_i,y_i,t_k) &= \sum_{n=0}^k\partial_y\tilde{E_z}(x_i,y_j,t_n),
+\end{aligned}\\
+&\begin{aligned}
+I_{H_y}(x_i,y_i,t_k) &= \sum_{n=0}^k\partial_x\tilde{E_z}(x_i,y_j,t_n),
+\end{aligned}\\
+&\begin{aligned}
+f_{m1}(m_i) &= \frac{\sigma_D(m_i) \Delta t}{2\varepsilon_0},~m\in\{x,y\},
+\end{aligned}\\
+&\begin{aligned}
+f_{m2}(m_i) &= \frac{1}{1+\sigma_D(m_{i+\frac{1}{2}})\frac{\Delta t}{2\varepsilon_0}},~m\in\{x,y\},
+\end{aligned}\\
+&\begin{aligned}
+f_{m3}(m_i) &= \frac{1-\sigma_D(m_{i+\frac{1}{2}})\frac{\Delta t}{2\varepsilon_0}}{1+\sigma_D(m_{i+\frac{1}{2}})\frac{\Delta t}{2\varepsilon_0}},~m\in\{x,y\},
+\end{aligned}\\
+&\begin{aligned}
+g_{m2}(m_i) &= \frac{1}{1+\sigma_D(m_{i})\frac{\Delta t}{2\varepsilon_0}},~m\in\{x,y\},
+\end{aligned}\\
+&\begin{aligned}
+g_{m3}(m_i) &= \frac{1-\sigma_D(m_{i})\frac{\Delta t}{2\varepsilon_0}}{1+\sigma_D(m_{i})\frac{\Delta t}{2\varepsilon_0}},~m\in\{x,y\},
+\end{aligned}\\
+&\begin{aligned}
+G_{az}(x_i,y_j) = \frac{1}{\varepsilon_r(x_i,y_j)+\frac{\sigma(x_i,y_j)\Delta t}{\varepsilon_0}},
+\end{aligned}\\
+&\begin{aligned}
+G_{bz}(x_i,y_j) = \frac{\sigma(x_i,y_j)\Delta t}{\varepsilon_0}.
+\end{aligned}
 \end{align}
 \end{subequations}
+\begin{strip}
+\begin{subequations}
+\label{eq:2D_FDTD_PML}
+\begin{empheq}[box=\fbox]{align}
+&\begin{aligned}
+\tilde{D_z}(x_i,y_i,t_k)&=g_{x3}(x_i)g_{y3}(y_j)\tilde{D_z}(x_i,y_j,t_{k-1})\\&+\frac{g_{x2}(x_i)g_{y2}(y_j)}{2}\left[H_y(x_i,y_i,t_k)-H_y(x_{i-1},y_i,t_k)\right.\\&\left.-H_x(x_i,y_j,t_k)+H_x(x_i,y_{j-1},t_k)\right],
+\end{aligned}\\
+&\begin{aligned}
+\tilde{E_z}(x_i,y_i,t_k)&=G_{az}(x_i,y_j)\left(\tilde{D_z}(x_i,y_j,t_k)-I_z(x_i,y_j,t_{k-1})\right),
+\end{aligned}\\
+&\begin{aligned}
+I_z(x_i,y_i,t_k)&=I_z(x_i,y_j,t_{k-1})+G_{bz}(x_i,y_j)\tilde{E_z},
+\end{aligned}\\
+&\begin{aligned}
+I_{H_x}(x_i,y_i,t_k)&=I_{H_x}(x_i,y_j,t_{k-1})+\partial_y\tilde{E_z}(x_i,y_j,t_k)
+\end{aligned}\\
+&\begin{aligned}
+I_{H_y}(x_i,y_i,t_k)&=I_{H_y}(x_i,y_j,t_{k-1})+\partial_x\tilde{E_z}(x_i,y_j,t_k)
+\end{aligned}\\
+&\begin{aligned}
+H_x(x_i,y_j,t_{k+1})&=f_{y3}(y_j)H_x(x_i,y_j,t_k)-\frac{f_{y2}(y_j)\partial_y\tilde{E_z}(x_i,y_j,t_k)}{2}\\&-f_{x1}(x_i)I_{H_x}(x_i,y_j,t_k)
+\end{aligned}\\
+&\begin{aligned}
+H_y(x_i,y_j,t_{k+1})&=f_{x3}(x_i)H_y(x_i,y_j,t_k)+\frac{f_{x2}(x_i)\partial_x\tilde{E_z}(x_i,y_j,t_k)}{2}\\&+f_{y1}(y_j)I_{H_y}(x_i,y_j,t_k)
+\end{aligned}\\
+\end{empheq}
+\end{subequations}
 \end{strip}
-
+Which allows us to write the FDTD formulation in 2D with a PML, arranged in iterative fashion above.
+\section{Implementation in Python 3}
+Equation~\ref{eq:2D_FDTD_PML} was implemented in standard Python 3 with the Numpy library. Plotting was done with Matplotlib. Appendix~\ref{ap:Code} contains the implementation. The following section contains results produced by this implementation.
+\section{Results}
+\subsection{Demonstration of the PML}
+\subsection{Single Slit}
+\subsection{Double Slit}
+\subsection{Diffraction from Small Object}
 
 \bibliography{References}
 \bibliographystyle{ieeetr}
@@ -673,7 +765,7 @@ Not only is this certainly wrong, it fails to even make sense, since $\Delta t$ 
 
 I provide my work below which lead me to this incorrect identity from the author's equations here. The author starts with (Eq. (3.23a) in \cite{Sullivan00})
 \begin{equation}
-\label{eq:2D_TM_Dz_w_H_app}i\omega\left(1+\frac{\sigma_D(x)}{i\omega\varepsilon_0}\right)\left(1+\frac{\sigma_D(y)}{i\omega\varepsilon_0}\right)\tilde{D_z}(\omega) &= c_0\left(\frac{\partial H_y}{\partial x}(\omega)-\frac{\partial H_x}{\partial y}(\omega)\right),
+\label{eq:2D_TM_Dz_w_H_app}i\omega\left(1+\frac{\sigma_D(x)}{i\omega\varepsilon_0}\right)\left(1+\frac{\sigma_D(y)}{i\omega\varepsilon_0}\right)\tilde{D_z}(\omega) = c_0\left(\frac{\partial H_y}{\partial x}(\omega)-\frac{\partial H_x}{\partial y}(\omega)\right),
 \end{equation}
 which is the same as Eq.~\ref{eq:2D_TM_Dz_w_H} used in this work. Using the following definitions (Eq. 3.15  in \cite{Sullivan00})
 \begin{subequations}
@@ -742,5 +834,295 @@ If the author's transformation is correct and the above un-discretization and Fo
 \begin{equation}
 \Delta t = \frac{2}{i\omega}.
 \end{equation}
-Clearly, something is wrong here. I cannot make sense of it, and not for lack of trying.
+Clearly, something is wrong here. I cannot make sense of it, and not for lack of trying. The author of \cite{Sullivan00} has described a PML technique different from most other literature found~\cite{Schneider10,Taflove00}. As such, it is difficult to reconstuct much of the derivations left out of \cite{Sullivan00}. However, the implementation still works, so we press forward.
+\newpage
+\section{Implementation of Two Dimensional FDTD with PML in Python 3}
+\label{ap:Code}
+\begin{minted}[fontsize=\fontsize{10}{12}\selectfont]{python}
+#!/bin/env python3
+
+#=============================================================================#
+"""
+This software is a minimum working example of the 2D FDTD method with PML
+as described in the accompanying paper by P. D. Cook.
+
+This program was written for Python 3.7.5.
+
+This software is being provided "as is", without any express or implied
+warranty. In particular, the authors do not make any representation or
+warranty of any kind concerning the merchantability of this software or its
+fitness for any particular purpose.
+"""
+#=============================================================================#
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from mpl_toolkits.mplot3d import Axes3D
+
+c  = 3E8      # speed of light in meters per second^2
+
+def FDTD2D(media,pulse,Nt,PMLSize = 5):
+    """
+        FDTD2D takes a Media object, Pulse object, and the number of timesteps.
+        Using the Finite Difference Time Domain method, it propagates the
+        electric and magnetic fields forward in time.
+
+        Returns:
+         Ez - electric field in the z direction as a function of time and space
+         Dz - electric displacement in the z direction as a function of time
+                and space
+         Hx - magnetic field in the x direction as a function of time and space
+         Hy - magnetic field in the y direction as a function of time and space
+    """
+
+    Ny, Nx = media.shape
+    dx     = media.dx
+    dt     = media.dt
+
+    assert(Nx >= 2*PMLSize and Ny >= 2*PMLSize)
+
+    times = np.arange(0,Nt*dt,dt)
+
+    # all arrays are indexed as [ti,yi,xi] (unless there is no t component, in
+    #   which case they are indexed as [yi,xi])
+    Dz  = np.zeros((Nt,Ny,Nx)) # electric displacement
+    Ez  = np.zeros((Nt,Ny,Nx)) # electric field
+    Hx  = np.zeros((Nt,Ny,Nx)) # magnetic field
+    Hy  = np.zeros((Nt,Ny,Nx)) # magnetic field
+    Ihx = np.zeros((Nt,Ny,Nx)) # integral of dyE
+    Ihy = np.zeros((Nt,Ny,Nx)) # integral of dxE
+    Iz  = np.zeros((Nt,Ny,Nx)) # integral of Ez
+
+    # read in the coefficient arrays for the media
+    if np.isscalar(media.Gaz) and np.isscalar(media.Gbz):
+        Gaz = media.Gaz*np.ones((Ny,Nx))
+        Gbz = media.Gbz*np.ones((Ny,Nx))
+    else:
+        Gaz = media.Gaz
+        Gbz = media.Gbz
+
+    # PML arrays
+    n1 = (1/(3*PMLSize**3))*np.arange(1,PMLSize+1)**3
+    n2 = (1/(3*PMLSize**3))*(np.arange(1,PMLSize+1)+1/2)**3
+
+    fx1 = np.zeros((Ny,Nx))
+    fx1[:,:PMLSize] = n1[::-1]
+    fx1[:,-1*PMLSize:] = n1
+
+    fx2 = np.ones((Ny,Nx))
+    fx2[:,:PMLSize] = 1/(1+n2[::-1])
+    fx2[:,-1*PMLSize:] = 1/(1+n2)
+
+    fx3 = np.ones((Ny,Nx))
+    fx3[:,:PMLSize] = (1-n2[::-1])/(1+n2[::-1])
+    fx3[:,-1*PMLSize:] = (1-n2)/(1+n2)
+
+    gx2 = 1/(1+fx1)
+    gx3 = (1-fx1)/(1+fx1)
+
+    fy1 = np.zeros((Ny,Nx))
+    fy1.T[:,:PMLSize] = n1[::-1]
+    fy1.T[:,-1*PMLSize:] = n1
+
+    fy2 = np.ones((Ny,Nx))
+    fy2.T[:,:PMLSize] = 1/(1+n2[::-1])
+    fy2.T[:,-1*PMLSize:] = 1/(1+n2)
+
+    fy3 = np.ones((Ny,Nx))
+    fy3.T[:,:PMLSize] = (1-n2[::-1])/(1+n2[::-1])
+    fy3.T[:,-1*PMLSize:] = (1-n2)/(1+n2)
+
+    gy2 = 1/(1+fy1)
+    gy3 = (1-fy1)/(1+fy1)
+
+    # get the pulse and save it
+    Pz = pulse.getPulse(times)
+
+    # FDTD loop
+    for ti, t in enumerate(times):
+        if ti == 0: continue
+        # I use a numpy trick here to do h[ti][yi][xi-1], by using np.roll
+        # axis = 0 corresponds to the y axis and axis = 1
+        #   corresponds to the x axis
+
+        # calculate electric displacement
+        Dz[ti] = gx3*gy3*Dz[ti-1]+0.5*gx2*gy2*(Hy[ti-1] - \
+            np.roll(Hy[ti-1],-1,axis=1) - Hx[ti-1] + \
+            np.roll(Hx[ti-1],-1,axis=0)) \
+            + Pz[ti]    # add pulse
+
+        # calculate electric field
+        Ez[ti] = Gaz*(Dz[ti]-Iz[ti-1])
+
+        # calculate integral of Ez
+        Iz[ti] = Iz[ti-1] + Gbz*Ez[ti]
+
+        # calculate magnetic field
+        dxE     = np.roll(Ez[ti],1,axis=1) - Ez[ti]
+        Ihy[ti] = Ihy[ti-1] + dxE
+        Hy[ti]  = fx3*Hy[ti-1] + 0.5*fx2*dxE + fy1*Ihy[ti]
+
+        dyE     = np.roll(Ez[ti],1,axis=0) - Ez[ti]
+        Ihx[ti] = Ihx[ti-1] + dyE
+        Hx[ti]  = fy3*Hx[ti-1] - 0.5*fy2*dyE - fx1*Ihx[ti]
+
+    # return arrays
+    return Ez, Dz, Hx, Hy
+
+class Media:
+    """
+        The Media class stores the Gaz and Gbz coefficient
+        arrays for the media, which are calculated from
+        spacially dependent epsilon_r (relative permittivity) and
+        sigma (conductivity) coefficients. It also stores
+        the size of the media and the spacings (dx and dt).
+
+        For free space epsilon_r = 1 and sigma = 0.
+
+        The default instance of this class is free space.
+    """
+    def __init__(self, Nx, Ny, dx, epsilon_r = 1, sigma = 0):
+
+        epsilon_0 = 8.89E-12 # permittivity of free space
+
+        self.shape = (Nx, Ny) # shape of the media
+        self.dx    = dx       # spacing
+        self.dt    = dx/(2*c) # timestep
+
+        # if epsilon_r and sigma are constant across all space,
+        #   then they need to be made into arrays
+        if np.isscalar(epsilon_r) and np.isscalar(sigma):
+             epsilon_r = epsilon_r*np.ones((Ny,Nx))
+             sigma   = sigma*np.ones((Ny,Nx))
+
+        # if only epsilon_r is constant across space,
+        #   then it will be made into an array with the
+        #   same shape as sigma
+        elif np.isscalar(epsilon_r):
+            assert(sigma.shape==(Ny,Nx))
+            epsilon_r = epsilon_r*np.ones(sigma.shape)
+
+        # if only sigma is constant across space,
+        #   then it will be made into an array with the
+        #   same shape as epsilon_r
+        elif np.isscalar(sigma):
+            assert(epsilon_r.shape==(Ny,Nx))
+            sigma = sigma*np.ones(epsilon_r.shape)
+
+        # if both epsilon_r and sigma are spacially dependent
+        #   then Gaz and Gbz can immediately be calculated
+        else:
+            assert(sigma.shape   == (Ny,Nx))
+            assert(epsilon_r.shape == (Ny,Nx))
+
+        self.Gaz = 1/(epsilon_r+(sigma*self.dt/epsilon_0))
+        self.Gbz = sigma*self.dt/epsilon_0
+
+class Pulse:
+    """
+        The Pulse class defines a pulse to set as the electric displacement
+            in the simulation.
+        It creates a 2D gaussian pulse in both time and space
+        It is definted by:
+            center        - where the pulse will be centered in space, (x0,y0)
+            radial_center - where the pulse will peak radially from the center
+                                for example:
+                                radial_center = 0:          radial_center > 0:
+
+                                --------                    --------
+                                --------                    --XXXX--
+                                ---XX---                    --X--X--
+                                ---XX---                    --X--X--
+                                --------                    --XXXX--
+                                --------                    --------
+
+            spacial_spread  - the standard deviation of the gaussian in space
+
+            temporal_center - where the peak of the pulse will be in time
+
+            temporal_spread - the standard deviation of the gaussian in time
+
+    """
+    def __init__(self, media, center, radial_center, spacial_spread, \
+                     temporal_center, temporal_spread):
+
+        self.temporal_center = temporal_center
+        self.temporal_spread = temporal_spread
+
+        Ny, Nx = media.shape
+        dx     = media.dx
+        x0, y0 = center
+
+        x, y    = np.meshgrid(np.linspace(-Nx/2,Nx/2,Nx)*dx, \
+                    np.linspace(-Ny/2,Ny/2,Ny)*dx)
+        d       = np.sqrt((x-x0)**2+(y-y0)**2)
+        self.g_space = np.exp(-( (( d - radial_center )**2) / \
+                    ( 2.0 * spacial_spread**2 ) ) )
+
+    def getPulse(self, times):
+        """
+            The getPulse method generates the pulse at the supplied times.
+        """
+
+        g_time = np.exp(-(times-self.temporal_center)**2 / \
+                    (2 * self.temporal_spread**2) )
+
+        return (g_time*(self.g_space*np.ones((g_time.size,\
+                    self.g_space.shape[0],self.g_space.shape[1]))).T).T
+
+def Animate(F, title="2D FDTD", excludePML = 0, cmin = None, cmax = None):
+    """
+        Animate will animate the propagation of a given field
+    """
+
+    if excludePML: F = F[:,excludePML:-excludePML,excludePML:-excludePML]
+
+    Nt, Ny, Nx = F.shape
+
+    fig, ax = plt.subplots(1,1)
+
+    if cmin is None: cmin = np.min(F)/3
+    if cmax is None: cmax = np.max(F)/3
+    im = ax.imshow(F[0], animated=True, clim=(cmin,cmax),\
+                    cmap=plt.get_cmap('gist_yarg'))
+
+    def updatefig(ti):
+        ti %= Nt
+        im.set_array(F[ti])
+        return [im]
+
+    ani = animation.FuncAnimation(fig, updatefig, interval=5, blit=True)
+    ax.set_title(title,size=24)
+    ax.set_xlabel("$x$",size=20)
+    ax.set_ylabel("$y$",size=20)
+    ax.tick_params(axis='both', which='major', labelsize=16)
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes('right', size='5%', pad=0.05)
+    cbar=fig.colorbar(im, cax=cax)
+    cax.set_ylabel("Field Strength (AU)",size=20)
+    cax.tick_params(axis='both', which='major', labelsize=16)
+    plt.show()
+
+def Energy(Ez,Hx,Hy):
+    """
+        Calculate the energy in the domain
+    """
+    Nt, Ny, Nx = Ez.shape
+    E_Ez = np.sum(Ez**2, axis=(1,2))
+    E_Hx = np.sum(Hx**2, axis=(1,2))
+    E_Hy = np.sum(Hy**2, axis=(1,2))
+    return E_Ez+E_Hx+E_Hy
+
+###############################################################################
+
+media = Media(200,200,0.1)
+pulse = Pulse(media, (0*media.dx,-25*media.dx), \
+             10*media.dx, 10*media.dx, 10*media.dt, 2*media.dt)
+Ez, Dz, Hx, Hy = FDTD2D(media, pulse, 500, PMLSize = 10)
+E = Energy(Ez,Hx,Hy)
+Animate(Ez,"Electric Field, $\\tilde{E}_z(x,y)$")
+\end{minted}
 \end{document}
