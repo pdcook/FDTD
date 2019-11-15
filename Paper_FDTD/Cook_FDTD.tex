@@ -1,4 +1,4 @@
-\documentclass[12pt,twocolumn]{article}
+\documentclass[12pt]{article}
 \usepackage{minted}
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{bm}
@@ -25,6 +25,8 @@
 \usepackage{epstopdf}
 \usepackage{esint}
 \usepackage{physics}
+\usepackage{multicol}
+\usepackage[textwidth=469.0pt,textheight=548.5pt]{geometry}
 \hypersetup{
     colorlinks=true,
     urlcolor=blue,
@@ -37,7 +39,7 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 \newcommand{\comment}[1]{}      % command for multiline comments
-\setlength\stripsep{3pt plus 1pt minus 1pt}
+%\setlength\stripsep{3pt plus 1pt minus 1pt}
 \renewcommand{\cftdotsep}{\cftnodots}
 \cftpagenumbersoff{figure}
 \cftpagenumbersoff{table}
@@ -55,6 +57,7 @@ In this work, the foundations behind the one- and two-dimensional finite-differe
 \keywords{Electromagnetic wave simulation, finite-difference time-domain, perfectly matched layer}
 \end{titlingpage}
 \newpage
+\begin{multicols}{2}
 \section{Introduction}
 The goal of the finite-difference time-domain (FDTD) method is to simulate the propagation of electromagnetic waves in complex geometry. For instance, propagation through several different materials with different dielectric constants, or electrical conductivities. Problems such as these are often impossible to solve analytically, and so numerical approaches, such as this one, are required.
 
@@ -131,9 +134,8 @@ This normalization yields the final set of equations that will be used to govern
 \end{subequations}
 In these equations, the two parameters that are material-specific appear only in Eq.~\ref{eq:D_time}. Larger relative permittivities, $\varepsilon_r$, decrease the strength of the electric field per unit charge, which has the effect of slowing electromagnetic waves. The dielectric conductivity, $\sigma$, represents the total dissipative effect of the material, accounting for any energy loss of the waves in the material.
 \section{Finite Difference Approximation of the Derivative}
-Let $f(x)$ be any continuous and thrice differientiable function with bounded derivatives. If we want to obtain an approximation of $f'(x)$, we start by considering $f(x+h)$ and $f(x-h)$, where $h$ is a small displacement. Theorem~\ref{thm:lagrange} in Appendix~\ref{ap:lagrange} allows us to write $f(x+h)$ and $f(x-h)$ as shown in Eq.~\ref{eq:expansions}.
-\vspace{-20pt}
-\begin{strip}
+Let $f(x)$ be any continuous and thrice differientiable function with bounded derivatives. If we want to obtain an approximation of $f'(x)$, we start by considering $f(x+h)$ and $f(x-h)$, where $h$ is a small displacement. Theorem~\ref{thm:lagrange} in Appendix~\ref{ap:lagrange} allows us to write $f(x+h)$ and $f(x-h)$ as shown in Eq.~\ref{eq:expansions}. Subtracting both expressions in Eq.~\ref{eq:expansions} and rearranging yields Eq.~\ref{eq:first_finite}.
+\end{multicols}
 \begin{equation}
 \label{eq:expansions}
 \begin{aligned}
@@ -141,9 +143,7 @@ f(x+h) &= f(x) + hf'(x) + \frac{h^2}{2}f''(x) + \frac{h^3}{3!}f'''(\eta_1) \\
 f(x-h) &= f(x) -hf'(x) + \frac{h^2}{2}f''(x) -\frac{h^3}{3!}f'''(\eta_2)
 \end{aligned}
 \end{equation}
-\end{strip}
 \begin{subequations}
-\begin{strip}
 \begin{equation}
 \label{eq:first_finite}
 \frac{f(x+h)-f(x-h)}{2h} = f'(x) + \frac{h^2}{6}\frac{f'''(\eta_1)+f'''(\eta_2)}{2}
@@ -152,10 +152,9 @@ f(x-h) &= f(x) -hf'(x) + \frac{h^2}{2}f''(x) -\frac{h^3}{3!}f'''(\eta_2)
 \label{eq:second_finite}
 \frac{f(x+h)-f(x-h)}{2h} = f'(x) + \frac{h^2}{6}f'''(\eta)
 \end{equation}
-\end{strip}
 \end{subequations}
-
-\noindent Subtracting both expressions in Eq.~\ref{eq:expansions} and rearranging yields Eq.~\ref{eq:first_finite}. Here, $\eta_1$ and $\eta_2$ are two unknown points in the domain of $f$. By applying the intermediate value theorem to the last term in Eq.~\ref{eq:first_finite}, the two unknown points can be reduced to a single unknown point, $\eta$. This leads to Eq.~\ref{eq:second_finite}. This equation suggests an approximation for the first derivative,
+\begin{multicols}{2}
+Here, $\eta_1$ and $\eta_2$ are two unknown points in the domain of $f$. By applying the intermediate value theorem to the last term in Eq.~\ref{eq:first_finite}, the two unknown points can be reduced to a single unknown point, $\eta$. This leads to Eq.~\ref{eq:second_finite}. This equation suggests an approximation for the first derivative,
 \begin{equation}
 \label{eq:approx_central_difference}
 f'(x) \approx \frac{f(x+h)-f(x-h)}{2h}.
@@ -180,25 +179,27 @@ For example purposes, a formulation of the FDTD method in one dimension is prese
 \end{align}
 \end{subequations}
 We will interleave $H_y$ and $\tilde{D_x}$ both spatially and temporally. This is one of the fundamental features of the FDTD method~\cite{Sullivan00}. To interleave the two fields, we evaluate them---as well as their derivatives---offset from one another by $\Delta z/2$ in space and $\Delta t/2$ in time,
+\end{multicols}
 \begin{subequations}
 \begin{equation}
 \label{eq:offset_dD_dt}\frac{\partial \tilde{D_x}}{\partial t}(z, t) = -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\partial H_y}{\partial z}(z, t)
 \end{equation}
 \vspace{-65pt}
-\begin{strip}
+%\begin{strip}
 \begin{equation}
 \label{eq:offset_dH_dt}\frac{\partial H_y}{\partial t}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right) = -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right)
 \end{equation}
-\end{strip}
+%\end{strip}
 \end{subequations}
 \begin{subequations}
-\begin{strip}
+%\begin{strip}
 \begin{align}
 \label{eq:first_discrete_dD_dt}\frac{\tilde{D_x}\left(z,t+\frac{\Delta t}{2}\right)-\tilde{D_x}\left(z,t-\frac{\Delta t}{2}\right)}{\Delta t} &= -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{H_y\left(z+\frac{\Delta z}{2},t\right)-H_y\left(z-\frac{\Delta z}{2},t\right)}{\Delta z} \\
 \label{eq:first_discrete_dH_dt}\frac{H_y\left(z+\frac{\Delta z}{2},t+\Delta t\right)-H_y\left(z+\frac{\Delta z}{2},t\right)}{\Delta t} &= -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\tilde{E_x}\left(z+\Delta z,t+\frac{\Delta t}{2}\right)-\tilde{E_x}\left(z,t+\frac{\Delta t}{2}\right)}{\Delta z}
 \end{align}
-\end{strip}
+%\end{strip}
 \end{subequations}
+\begin{multicols}{2}
 Using the central difference approximation of the derivative, Eq.~\ref{eq:approx_central_difference}, on each of the derivatives---using the same spacing as the offsets from the interleaving process, $\Delta z/2$ for the spatial stepsize and $\Delta t/2$ for the temporal stepsize---leads us to Eqs.~\ref{eq:first_discrete_dD_dt}~and~\ref{eq:first_discrete_dH_dt}.
 
 Now, we impose restrictions on $\Delta t$ and $\Delta z$ to ensure stability. A discussion including the reasoning for this is presented in the next section. By forcing
@@ -312,7 +313,7 @@ which guarantees stability in one-, two-, three-, and even four-dimensional FDTD
 \section{Boundary Conditions}
 In code, we cannot simulate infinite fields. This applies not only to the one-dimensional method, but all higher dimensional methods as well. As such, we will talk about $x$ as a general spatial coordinate here, instead of $z$. Since we cannot store fields with infinite size in any computer code, there must be some finite number of $x$ values, say $N$. Then there must be some initial and final $x_i$, say $x_0$ and $x_{N-1}$ respectively. This section discusses three techniques to handle the non-existent values of $x_{-1}$ and $x_{N}$.
 \subsection{Hard Boundaries}
-One of the simplest ways to handle the boundaries is to force ${x_i=0~\mathrm{for}~i<0~\mathrm{or}~i>N-1}$. However, this results in erroneous reflections, which are not ideal~\cite{Sullivan00}.
+One of the simplest ways to handle the boundaries is to force $x_i=0~\mathrm{for}~i<0$ and $x_i=0~\mathrm{or}~i>N-1$. However, this results in erroneous reflections, which are not ideal~\cite{Sullivan00}.
 \subsection{Cyclic Boundaries}
 A similar, but slightly more efficient boundary condition is the cyclic boundary condition in which
 \begin{equation}
@@ -340,9 +341,9 @@ where $\eta$ is the intrinsic impedance of either medium, given by
 \eta=\sqrt{\frac{\mu}{\varepsilon}}.
 \end{equation}
 We have considered $\mu$ to be constant for all media (with a value of $\mu_0$) in all prior discussions. However, suppose near the edge of the computational domain, a medium was placed with a specifically chosen $\mu$ such that $\Gamma=0$, hence the name ``perfectly matched layer''. Then, there would be no reflections from this medium. This solves the problem of reflections from this medium, but waves would still reflect from the boundary of the domain, if not sufficiently attenuated in this new medium. Just as in previous discussions, the conductivity, $\sigma$, represents the attenuatation of a medium. Thus, we may introduce fictitious media near the boundaries of the computational domain with specifically chosen constants $\mu$ and $\sigma$ such that they do not reflect any waves and attenuate the waves that enter them. These media are the perfectly matched layers, since their intrinsic impedance exactly matches that of the neighboring domain. Figure~\ref{fig:PML} illustrates the placement of the PML in a two-dimensional domain. It is important to note that the following discussion will be in the general three-dimensional case.
-\begin{figure}
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.5\linewidth]{PML.eps}
+\includegraphics[width=0.8\linewidth]{PML.eps}
 \caption{Placement of the PML in a two-dimensional domain. In (a), no PML is present and thus no material constants have been chosen or modified. The area marked by (b) is where the PML for the $y$ direction has been placed, waves will be attenuated in this region to prevent them from reflecting from the boundary of the domain. The PMLs in the $x$ and $y$ directions overlap in (c).}
 \label{fig:PML}
 \end{figure}
@@ -485,7 +486,8 @@ Since the waves will propagate in the $xy$-plane, there is no $z$ dependence in 
 \end{equation}
 \end{subequations}
  Thus, Eqs.~\ref{eq:PML_H_w},~\ref{eq:PML_D_w_H},~and~\ref{eq:PML_D_w_E} become
-\begin{strip}
+%\begin{strip}
+\end{multicols}
 \begin{subequations}
 \begin{align}
 \label{eq:2D_TM_Hx_w}i\omega\left(1+\frac{\sigma_D(x)}{i\omega\varepsilon_0}\right)^{-1}\left(1+\frac{\sigma_D(y)}{i\omega\varepsilon_0}\right)H_x(\omega) &= -c_0\frac{\partial \tilde{E_z}}{\partial y}(\omega),\\
@@ -494,7 +496,8 @@ Since the waves will propagate in the $xy$-plane, there is no $z$ dependence in 
 \label{eq:2D_TM_Dz_w_E}\tilde{D_z}(\omega)&=\varepsilon_r(\omega)\tilde{E_z}(\omega)+\frac{\sigma}{i\omega\varepsilon_0}\tilde{E_z}(\omega).
 \end{align}
 \end{subequations}
-\end{strip}
+%\end{strip}
+\begin{multicols}{2}
 
 \noindent We note again the important fact that Eq.~\ref{eq:2D_TM_Dz_w_E} is the only part of this formulation to contain information about the propgation medium. All other parts, Eqs.~\ref{eq:2D_TM_Hx_w},~\ref{eq:2D_TM_Hy_w},~and~\ref{eq:2D_TM_Dz_w_H}, only contain information about propagation in free space and the PML.
 
@@ -520,9 +523,11 @@ y_j&=j\Delta x
 \end{split}\right.~~&\mathrm{for}~\varepsilon_r,~\sigma~\mathrm{and},~\sigma_D.
 \end{aligned}
 \end{equation}
-Using this, we discretize Eqs.~\ref{eq:2D_TM_Hx_w},~\ref{eq:2D_TM_Hy_w},~\ref{eq:2D_TM_Dz_w_H},~and~\ref{eq:2D_TM_Dz_w_E} and transform them to the time-domain\footnote{See Appendix~\ref{ap:Sullivan} for explaination on why so many steps were skipped here.}, treating Eq.~\ref{eq:2D_TM_Dz_w_E} exactly as in previous discussions. To save space, we first introduce,
+Using this, we discretize Eqs. \ref{eq:2D_TM_Hx_w}, \ref{eq:2D_TM_Hy_w}, \ref{eq:2D_TM_Dz_w_H}, and \ref{eq:2D_TM_Dz_w_E} and transform them to the time-domain\footnote{See Appendix~\ref{ap:Sullivan} for explaination on why so many steps were skipped here.}, treating Eq.~\ref{eq:2D_TM_Dz_w_E} exactly as in previous discussions. To save space, we first introduce,
 \begin{subequations}
 \label{eq:substitutions}
+\begingroup
+\allowdisplaybreaks
 \begin{align}
 &\begin{aligned}
 \partial_x\tilde{E_z}(x_i,y_i,t_k) &= \tilde{E_z}(x_{i+1},y_j,t_k)\\&-\tilde{E_z}(x_i,y_j,t_k),
@@ -561,8 +566,10 @@ G_{az}(x_i,y_j) = \frac{1}{\varepsilon_r(x_i,y_j)+\frac{\sigma(x_i,y_j)\Delta t}
 G_{bz}(x_i,y_j) = \frac{\sigma(x_i,y_j)\Delta t}{\varepsilon_0}.
 \end{aligned}
 \end{align}
+\endgroup
 \end{subequations}
-\begin{strip}
+%\begin{strip}
+\end{multicols}
 \begin{subequations}
 \label{eq:2D_FDTD_PML}
 \begin{empheq}[box=\fbox]{align}
@@ -586,10 +593,11 @@ H_x(x_i,y_j,t_{k+1})&=f_{y3}(y_j)H_x(x_i,y_j,t_k)-\frac{f_{y2}(y_j)\partial_y\ti
 \end{aligned}\\
 &\begin{aligned}
 H_y(x_i,y_j,t_{k+1})&=f_{x3}(x_i)H_y(x_i,y_j,t_k)+\frac{f_{x2}(x_i)\partial_x\tilde{E_z}(x_i,y_j,t_k)}{2}\\&+f_{y1}(y_j)I_{H_y}(x_i,y_j,t_k)
-\end{aligned}\\
+\end{aligned}
 \end{empheq}
 \end{subequations}
-\end{strip}
+%\end{strip}
+\begin{multicols}{2}
 Which allows us to write the FDTD formulation in 2D with a PML, arranged in iterative fashion above.
 
 As mentioned before, gradually increasing $\sigma_D$ in the PML will cause the waves in the PML to be attenuated without reflection. However, instead of gradually increasing $\sigma_D$, we may instead gradually increase $\frac{\sigma_D(m_i)\Delta t}{2\varepsilon_0}$, since all of the parts of Eq.~\ref{eq:substitutions}---and thus also Eq.~\ref{eq:2D_FDTD_PML}---with dependence on $\sigma_D$ are in this form. We gradually increase this through an auxiliary parameter~\cite{Sullivan00},
@@ -626,33 +634,33 @@ It is important to note the difference between $f_{m2}$, $f_{m3}$ and $g_{m2}$, 
 xn(i+\frac{1}{2}) = \frac{1}{3}\left(\frac{i+\frac{1}{2}}{L}\right)^3.
 \end{equation}
 A final note is that our choice of how we gradually increased the auxiliary parameter was somewhat arbitrary. The cubic power in Eq.~\ref{eq:auxiliary} was found empirically~\cite{Sullivan00}.
-\section{Implementation in Python 3}
+\section{Implementation in \\ Python 3}
 Equation~\ref{eq:2D_FDTD_PML} was implemented in standard Python 3 with the Numpy library. Plotting was done with Matplotlib. Appendix~\ref{ap:Code} contains the implementation. The following section contains results produced by this implementation.
 \section{Results}
 A variety of geometries were simulated with the code in Appendix~\ref{ap:Code}. All simulations were done in free-space with $\varepsilon = \varepsilon_0$ and $\sigma=0$, except for any geometry added. A point source with finite spatial and temporal width offset above the center of the domain was used in all simulations. The pulse just a few timesteps after its maximum is shown in Fig.~\ref{fig:before}.
-\begin{figure}
+\begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{Before.eps}
+\includegraphics[width=0.85\linewidth]{Before.eps}
 \caption{The pulse used in all simulations before interacting with any geometry. Shown here is the pulse a few timesteps after its peak.}
 \label{fig:before}
 \end{figure}
 \subsection{Demonstration of the PML}
 First, we demonstrate the effectiveness of the PML. Without it, waves would reflect from the boundary, and thus the circular symmetry of the pulse used would not persist without it. To demonstrate that the PML minimizes reflections from the boundary, a free-space simulation was done with a PML at the edge of each boundary, 10 voxels thick. The pulse, several hundred timesteps after its peak, is shown in Fig.~\ref{fig:PMLsim}. This figure demonstrates that reflections from the boundary are sufficiently attenuated by the PML, maintaining the circular symmetry of the pulse in the region of the domain that is not part of the PML.
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{DemonstrationOfPML.eps}
 \caption{The pulse being attenuated in the PML, preventing erroneous reflections from effecting the domain.}
 \label{fig:PMLsim}
 \end{figure}
 \subsection{Reflection from Barrier}
-A simulation was performed in which a 20 voxel thick barrier with $\varepsilon_r=2$ and $\sigma=0.005$ (arbitrary units) was placed across the entire $x$-axis centered in the domain. Figure~\ref{eq:WallDuring} shows the waves shortly after the initial interaction with the barrier. This figure demonstrates both the change in propagation speed in the barrier (since $\varepsilon_r>1$) and the attenuation of the wave in the barrier (since $\sigma>0$). Moreover, this figure also demonstrates why the ficticious material properties of the PML had to be chosen so particularly, since boundaries with mismatched material properties will cause reflection. Figure~\ref{fig:WallAfter} shows the pulse long after the initial interaction with the barrier. Parts of the pulse that transmitted through the barrier have been significantly attenuated and have traveled a much shorter distance compared to those that never interacted with the barrier.
-\begin{figure}
+A simulation was performed in which a 20 voxel thick barrier with $\varepsilon_r=2$ and $\sigma=0.005$ (arbitrary units) was placed across the entire $x$-axis centered in the domain. Figure~\ref{fig:WallDuring} shows the waves shortly after the initial interaction with the barrier. This figure demonstrates both the change in propagation speed in the barrier (since $\varepsilon_r>1$) and the attenuation of the wave in the barrier (since $\sigma>0$). Moreover, this figure also demonstrates why the ficticious material properties of the PML had to be chosen so particularly, since boundaries with mismatched material properties will cause reflection. Figure~\ref{fig:WallAfter} shows the pulse long after the initial interaction with the barrier. Parts of the pulse that transmitted through the barrier have been significantly attenuated and have traveled a much shorter distance compared to those that never interacted with the barrier.
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{HardWallDuring.eps}
 \caption{The pulse beginning to propagate through and reflect from a barrier placed across the $x$-axis, centered in the domain.}
 \label{fig:WallDuring}
 \end{figure}
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{HardWallAfter.eps}
 \caption{The pulse long after its initial interaction with the barrier placed across the $x$-axis, centered in the domain.}
@@ -660,27 +668,27 @@ A simulation was performed in which a 20 voxel thick barrier with $\varepsilon_r
 \end{figure}
 \subsection{Diffraction from Small Object}
 A small object 20 by 20 voxels was placed at the origin to simulate the effects of diffraction. The object's material constants were $\varepsilon_r=1$ and $\sigma=0.01$. Figure~\ref{fig:SmallObjectAfter} shows the pulse beginning to interact with the object, effectively removing part of its circular wave. Figure~\ref{fig:SmallObjectLongAfter} shows the same pulse long after interacting with the object, demonstrating some diffraction and interference effects in the same region that was originally significantly effected.
-\begin{figure}
+\begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{SmallObjectAfter.eps}
+\includegraphics[width=0.98\linewidth]{SmallObjectAfter.eps}
 \caption{The pulse shortly after interacting with a small square object placed at the origin.}
 \label{fig:SmallObjectAfter}
 \end{figure}
-\begin{figure}
+\begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{SmallObjectLongAfter.eps}
+\includegraphics[width=0.98\linewidth]{SmallObjectLongAfter.eps}
 \caption{The pulse long after interacting with a small square object placed at the origin, demonstrating some diffraction events on the side opposite the object from the origin of the pulse.}
 \label{fig:SmallObjectLongAfter}
 \end{figure}
 \subsection{Single Slit Interference}
 A classic single slit geometry was simulated as well. A similar barrier to before, except 10 voxel thick and with material constants $\varepsilon_r=2$ and $\sigma=0.05$ was placed across the $x$-axis, centered in the domain. A slit was removed from the center of the barrier, 20 voxels wide. Figure~\ref{fig:SingleSlitDuring} shows the pulse initially interacting with the slit, demonstrating significant interference and diffraction effects as well as minimal transmission into the barrier. Figure~\ref{fig:SingleSlitAfter} shows the pulse long after it has interacted with the slit. The classic central maximum and adjacent minima predicted in single slit interference experiments can be seen in this figure.
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{SingleSlitDuring.eps}
 \caption{The pulse initially interacting with a single slit in a barrier.}
 \label{fig:SingleSlitDuring}
 \end{figure}
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{SingleSlitAfter.eps}
 \caption{The pulse after its interaction with a single slit, demonstrating interference effects.}
@@ -688,13 +696,13 @@ A classic single slit geometry was simulated as well. A similar barrier to befor
 \end{figure}
 \subsection{Double Slit Interference}
 Finally, the famous double slit interference situation was simulated. The same 10 voxel thick, $\varepsilon_r=2$ $\sigma=0.05$, barrier as in the previous section was used. Two 10 voxel wide sections were removed, leaving a 10 by 10 voxel block of the barrier in the center of the domain. Figure~\ref{fig:DoubleSlitDuring} shows the pulse initially interacting with the two slits, showing resemblance to the initial interaction with the single slit shown in Fig.~\ref{fig:SingleSlitDuring}. However, as shown in Fig.~\ref{fig:DoubleSlitAfter}, many timesteps after the pulse's interaction with the two slits, the interference pattern is significantly more pronounced than in the single-slit case. Many minima and maxima are present in the interference pattern below the two slits, as observed in many experiments before.
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{DoubleSlitDuring.eps}
 \caption{The pulse initially interacting with two nearby slits in the barrier.}
 \label{fig:DoubleSlitDuring}
 \end{figure}
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{DoubleSlitAfter.eps}
 \caption{The pulse long after its interaction with the double-slit geometry. Classic interference patterns are present.}
@@ -708,7 +716,7 @@ I would like to thank F.D.C. Willard for helpful discussions and encouragement r
 \bibliography{References}
 \bibliographystyle{ieeetr}
 \newpage
-\onecolumn
+\end{multicols}
 \appendix
 \section{Inverse Fourier Transform of $E(\omega)/i\omega$}
 \label{ap:fourier1}
