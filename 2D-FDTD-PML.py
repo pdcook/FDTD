@@ -18,6 +18,7 @@ fitness for any particular purpose.
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d import Axes3D
 
 c  = 3E8      # speed of light in meters per second^2
@@ -231,7 +232,7 @@ class Pulse:
         return (g_time*(self.g_space*np.ones((g_time.size,\
                     self.g_space.shape[0],self.g_space.shape[1]))).T).T
 
-def Animate(F, excludePML = 0, cmin = None, cmax = None):
+def Animate(F, title="2D FDTD", excludePML = 0, cmin = None, cmax = None):
     """
         Animate will animate the propagation of a given field
     """
@@ -244,7 +245,8 @@ def Animate(F, excludePML = 0, cmin = None, cmax = None):
 
     if cmin is None: cmin = np.min(F)/3
     if cmax is None: cmax = np.max(F)/3
-    im = ax.imshow(F[0], animated=True, clim=(cmin,cmax))
+    im = ax.imshow(F[0], animated=True, clim=(cmin,cmax),\
+                    cmap=plt.get_cmap('gist_yarg'))
 
     def updatefig(ti):
         ti %= Nt
@@ -252,6 +254,15 @@ def Animate(F, excludePML = 0, cmin = None, cmax = None):
         return [im]
 
     ani = animation.FuncAnimation(fig, updatefig, interval=5, blit=True)
+    ax.set_title(title,size=24)
+    ax.set_xlabel("$x$",size=20)
+    ax.set_ylabel("$y$",size=20)
+    ax.tick_params(axis='both', which='major', labelsize=16)
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes('right', size='5%', pad=0.05)
+    cbar=fig.colorbar(im, cax=cax)
+    cax.set_ylabel("Field Strength (AU)",size=20)
+    cax.tick_params(axis='both', which='major', labelsize=16)
     plt.show()
 
 def Energy(Ez,Hx,Hy):
@@ -269,6 +280,6 @@ def Energy(Ez,Hx,Hy):
 media = Media(200,200,0.1)
 pulse = Pulse(media, (0*media.dx,-25*media.dx), \
              10*media.dx, 10*media.dx, 10*media.dt, 2*media.dt)
-Ez, Dz, Hx, Hy = FDTD2D(media, pulse, 200, PMLSize = 10)
+Ez, Dz, Hx, Hy = FDTD2D(media, pulse, 500, PMLSize = 10)
 E = Energy(Ez,Hx,Hy)
-Animate(Ez)
+Animate(Ez,"Electric Field, $\\tilde{E}_z(x,y)$")
