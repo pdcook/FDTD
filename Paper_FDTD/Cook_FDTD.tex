@@ -303,6 +303,7 @@ where the sum in the denominator is over all spatial dimensions. For example, th
 
 For simplicity in this paper, we choose
 \begin{equation}
+\label{eq:deltat}
 \Delta t = \frac{\Delta x}{2 c_0},
 \end{equation}
 which guarantees stability in one-, two-, three-, and even four-dimensional FDTD simulations. However, this is not the fastest or most efficient choice of $\Delta t$.
@@ -337,7 +338,7 @@ where $\eta$ is the intrinsic impedance of either medium, given by
 \begin{equation}
 \eta=\sqrt{\frac{\mu}{\varepsilon}}.
 \end{equation}
-We have considered $\mu$ to be constant for all media (with a value of $\mu_0$) in all prior discussions. However, suppose near the edge of the computational domain, a medium was placed with a specifically chosen $\mu$ such that $\Gamma=0$, hence the name ``perfectly matched layer''. Then, there would be no reflections from this medium. This solves the problem of reflections from this medium, but waves would still reflect from the boundary of the domain, if not sufficiently attenuated in this new medium. Just as in previous discussions, the conductivity, $\sigma$, represents the attenuatation of a medium. Thus, we may introduce fictitious media near the boundaries of the computational domain with specifically chosen constants $\mu$ and $\sigma$ such that they do not reflect any waves and attenutate the waves that enter them. These media are the perfectly matched layers, since their intrinsic impedance exactly matches that of the neighboring domain. Figure~\ref{fig:PML} illustrates the placement of the PML in a two-dimensional domain. It is important to note that the following discussion will be in the general three-dimensional case.
+We have considered $\mu$ to be constant for all media (with a value of $\mu_0$) in all prior discussions. However, suppose near the edge of the computational domain, a medium was placed with a specifically chosen $\mu$ such that $\Gamma=0$, hence the name ``perfectly matched layer''. Then, there would be no reflections from this medium. This solves the problem of reflections from this medium, but waves would still reflect from the boundary of the domain, if not sufficiently attenuated in this new medium. Just as in previous discussions, the conductivity, $\sigma$, represents the attenuatation of a medium. Thus, we may introduce fictitious media near the boundaries of the computational domain with specifically chosen constants $\mu$ and $\sigma$ such that they do not reflect any waves and attenuate the waves that enter them. These media are the perfectly matched layers, since their intrinsic impedance exactly matches that of the neighboring domain. Figure~\ref{fig:PML} illustrates the placement of the PML in a two-dimensional domain. It is important to note that the following discussion will be in the general three-dimensional case.
 \begin{figure}
 \centering
 \includegraphics[width=0.5\linewidth]{PML.eps}
@@ -356,7 +357,7 @@ To create these PMLs, we introduce fictitious dielectric constants and permeabil
 \end{equation}
 where $\sigma_{Dm}$ denotes the electric conductivity in the $m$ direction, and $\sigma_{Hm}$ denotes the magnetic conductivity in the $m$ direction. Note that $m$ and $r$ are independent. The spatial dependence is denoted by $r$, which can be any of the three spatial coordinates $\{x,y,z\}$. However, $m$ denotes the direction that the constant applies in. For example, $\varepsilon_{Fx}^*(y)$ denotes the $x$-axis dielectric constant as a function of $y$, which may change with $y$, but not with $x$ or $z$. It is very important to note that $\varepsilon_{Fm}^*$ and $\mu_{Fm}^*$ have nothing at all to do with $\varepsilon_r^*$, introduced in Eq.~\ref{eq:epsilon_form}, the relative permittivity of the propagation medium. These fictitious constants only apply in the PMLs, which reside near the boundaries of the computational domain.
 
-We introduce $\bm{\varepsilon_F^*}(\mathbf{r})$ and $\bm{\mu_F^*}(\mathbf{r})$, which are functions of three-dimensional position, $\mathbf{r}$,
+We introduce $\bm{\varepsilon_F^*}(\mathbf{r})$ and $\bm{\mu_F^*}(\mathbf{r})$, which are functions of position,
 \renewcommand{\arraystretch}{1.75}
 \begin{subequations}
 \begin{equation}
@@ -377,12 +378,12 @@ We introduce $\bm{\varepsilon_F^*}(\mathbf{r})$ and $\bm{\mu_F^*}(\mathbf{r})$, 
 Which, after transforming Eqs.~\ref{eq:dH_dt},~\ref{eq:D_time},~and~\ref{eq:dD_dt} to the frequency domain---which requires identities derived in Appendices~\ref{ap:fourier1}~and~\ref{ap:fourier2}---allows us to write
 \begin{subequations}
 \begin{empheq}[box=\fbox]{align}
-\label{eq:PML_dH_dt}i\omega\bm{\mu_F^*}\odot&\mathbf{H}(\omega) = -c_0\curl{\mathbf{\tilde{E}}(\omega)},\\
-\label{eq:PML_dD_dt}i\omega\bm{\varepsilon_F^*}\odot&\mathbf{\tilde{D}}(\omega) = c_0\curl{\mathbf{H}(\omega)},\\
-\label{eq:PML_D_time}\mathbf{\tilde{D}}(\omega) &= \varepsilon_r(\omega)\mathbf{\tilde{E}}(\omega) + \frac{\sigma}{i\omega\varepsilon_0}\mathbf{\tilde{E}}(\omega).
+\label{eq:PML_H_w}i\omega\bm{\mu_F^*}\odot&\mathbf{H}(\omega) = -c_0\curl{\mathbf{\tilde{E}}(\omega)},\\
+\label{eq:PML_D_w_H}i\omega\bm{\varepsilon_F^*}\odot&\mathbf{\tilde{D}}(\omega) = c_0\curl{\mathbf{H}(\omega)},\\
+\label{eq:PML_D_w_E}\mathbf{\tilde{D}}(\omega) &= \varepsilon_r(\omega)\mathbf{\tilde{E}}(\omega) + \frac{\sigma}{i\omega\varepsilon_0}\mathbf{\tilde{E}}(\omega).
 \end{empheq}
 \end{subequations}
-Where $\odot$ denotes the Hadamard product (elementwise product). This is the restatement of Maxwell's equations in the context of a PML\@. As before, only Eq.~\ref{eq:PML_D_time} contains information about the propagation medium. However, this time Eqs.~\ref{eq:PML_dH_dt}~and~\ref{eq:PML_dD_dt} are the only equations to contain information about the PML\@.
+Where $\odot$ denotes the Hadamard product (elementwise product). This is the restatement of Maxwell's equations in the frequency domain in the context of a PML\@. We must be state them in the frequency domain first, since our assumed form of $\varepsilon_{Fm}^*$ and $\mu_{Fm}^*$ are frequency-dependent, shown in Eq.~\ref{eq:fictitious}. As before, only Eq.~\ref{eq:PML_D_w_E} contains information about the propagation medium. However, this time Eqs.~\ref{eq:PML_H_w}~and~\ref{eq:PML_D_w_H} are the only equations to contain information about the PML\@.
 
 There are two restrictions for these fictitious constants to form a PML~\cite{Sacks95},
 \begin{enumerate}
@@ -408,8 +409,8 @@ To satisfy both of these conditions, we may choose, for all of the parallel coor
 \begin{equation}
 \begin{aligned}
 \varepsilon_{Fm_\parallel}(r)&=\mu_{Fm_\parallel}(r)=1,\\
-\sigma_{Dm_\parallel}(r) &= \sigma_{m_\parallel}(r),\\
-\sigma_{Hm_\parallel}(r) &= \frac{\mu_0}{\varepsilon_0}\sigma_{m_\parallel}(r).
+\sigma_{Dm_\parallel}(r) &= \sigma_{D}(r),\\
+\sigma_{Hm_\parallel}(r) &= \frac{\mu_0}{\varepsilon_0}\sigma_{D}(r).
 \end{aligned}
 \end{equation}
 Substituting this into Eq.~\ref{eq:fictitious} and using Eq.~\ref{eq:condition2} to find the constants in the perpendicular direction yields
@@ -417,25 +418,92 @@ Substituting this into Eq.~\ref{eq:fictitious} and using Eq.~\ref{eq:condition2}
 \begin{align}
 &\left\{
 \begin{aligned}
-\varepsilon_{Fm_\parallel}^*(r)&=1+\frac{\sigma_{m_\parallel}(r)}{i\omega\varepsilon_0}\\
-\mu_{Fm_\parallel}^*(r)&=1+\frac{\sigma_{m_\parallel}(r)}{i\omega\varepsilon_0}
+\varepsilon_{Fm_\parallel}^*(r)&=1+\frac{\sigma_{D}(r)}{i\omega\varepsilon_0}\\
+\mu_{Fm_\parallel}^*(r)&=1+\frac{\sigma_{D}(r)}{i\omega\varepsilon_0}
 \end{aligned}\right.,\\
 &\left\{
 \begin{aligned}
-\varepsilon_{Fm_\perp}^*(r)&=\left(1+\frac{\sigma_{m_\perp}(r)}{i\omega\varepsilon_0}\right)^{-1}\\
-\mu_{Fm_\perp}^*(r)&=\left(1+\frac{\sigma_{m_\perp}(r)}{i\omega\varepsilon_0}\right)^{-1}
+\varepsilon_{Fm_\perp}^*(r)&=\left(1+\frac{\sigma_{D}(r)}{i\omega\varepsilon_0}\right)^{-1}\\
+\mu_{Fm_\perp}^*(r)&=\left(1+\frac{\sigma_{D}(r)}{i\omega\varepsilon_0}\right)^{-1}
 \end{aligned}\right..
 \end{align}
 \end{subequations}
 Which clearly satisfies both conditions.
 
-Now, if we increase $\sigma$
-
+By gradually increasing $\sigma_{D}$ in the PML, waves in the PML will be attenuated due to Eqs.~\ref{eq:PML_H_w}~and~\ref{eq:PML_D_w_H}. We have not transformed Eqs.~\ref{eq:PML_H_w},~\ref{eq:PML_D_w_H},~and~\ref{eq:PML_D_w_E} back into the time domain, since doing so is tricky and can be done after the dimensionality for an implementation is chosen.
 
 \section{Heterogeneous Media}
+While it has not been explicitly stated, all of the material constants pertaining to the propgation medium may be spatially dependent. We have already seen that the fictitious material constants of the PML were spatially dependent in order to attenuate waves. In Eq.~\ref{eq:D_time}~and~\ref{eq:PML_D_w_E}, $\varepsilon_r$ and $\sigma$ may be written as functions of position, $\mathbf{r}$. Consequently, in the formulation of FDTD in one-dimension, $\varepsilon_r$ and $\sigma$ could have been written as $\varepsilon_r(z_i)$ and $\sigma(z_i)$ respectively.
 
-\section{Formulation of FDTD in Two Dimensions}
+\section{Formulation of FDTD in Two Dimensions with PML}
+Before we transform Eqs.~\ref{eq:PML_H_w},~\ref{eq:PML_D_w_H},~and~\ref{eq:PML_D_w_E} back into the time domain and discretize them, we must choose between the transverse magnetic (TM) mode and transverse electric (TE) mode. For waves propagating in the $xy$-plane, the fields involved with each mode are
+\begin{subequations}
+\begin{equation}
+\mathrm{TM}~\left\{\begin{split}
+\tilde{E_z}\\
+H_x\\
+H_y
+\end{split}\right.,
+\end{equation}
+\begin{equation}
+\mathrm{TE}~\left\{\begin{split}
+H_z\\
+\tilde{E_x}\\
+\tilde{E_y}
+\end{split}\right..
+\end{equation}
+\end{subequations}
+Arbitrarily, again, we will choose the TM mode. We start by implementing the PML in the $x$ direction,
+\begin{subequations}
+\begin{equation}
+\textit{PML}_x~\left\{\begin{split}
+\varepsilon_{Fx}^*(x)=\mu_{Fx}^*(x)&=\left(1+\frac{\sigma_D(x)}{i\omega\varepsilon_0}\right)^{-1}\\
+\varepsilon_{Fy}^*(x)=\mu_{Fy}^*(x)&=1+\frac{\sigma_D(x)}{i\omega\varepsilon_0}\\
+\varepsilon_{Fz}^*(x)=\mu_{Fz}^*(x)&=1+\frac{\sigma_D(x)}{i\omega\varepsilon_0}
+\end{split}\right..
+\end{equation}
+\end{subequations}
+And similarly for the $y$ direction,
+\begin{subequations}
+\begin{equation}
+\textit{PML}_y~\left\{\begin{split}
+\varepsilon_{Fy}^*(y)=\mu_{Fy}^*(y)&=\left(1+\frac{\sigma_D(y)}{i\omega\varepsilon_0}\right)^{-1}\\
+\varepsilon_{Fx}^*(y)=\mu_{Fx}^*(y)&=1+\frac{\sigma_D(y)}{i\omega\varepsilon_0}\\
+\varepsilon_{Fz}^*(y)=\mu_{Fz}^*(y)&=1+\frac{\sigma_D(y)}{i\omega\varepsilon_0}
+\end{split}\right..
+\end{equation}
+\end{subequations}
+Since the waves will propagate in the $xy$-plane, there is no $z$ dependence in our two-dimensional formulation, so the PML is the $z$ direction is ignored,
+\begin{subequations}
+\begin{equation}
+\textit{PML}_z~\left\{\begin{split}
+\varepsilon_{Fz}^*(z)=\mu_{Fz}^*(z)&=1\\
+\varepsilon_{Fx}^*(z)=\mu_{Fx}^*(z)&=1\\
+\varepsilon_{Fy}^*(z)=\mu_{Fy}^*(z)&=1
+\end{split}\right..
+\end{equation}
+\end{subequations}
+ Thus, Eqs.~\ref{eq:PML_H_w},~\ref{eq:PML_D_w_H},~and~\ref{eq:PML_D_w_E} become
+\begin{strip}
+\begin{subequations}
+\begin{align}
+\label{eq:2D_TM_Hx_w}i\omega\left(1+\frac{\sigma_D(x)}{i\omega\varepsilon_0}\right)^{-1}\left(1+\frac{\sigma_D(y)}{i\omega\varepsilon_0}\right)H_x(\omega) &= -c_0\frac{\partial \tilde{E_z}}{\partial y}(\omega),\\
+\label{eq:2D_TM_Hy_w}i\omega\left(1+\frac{\sigma_D(x)}{i\omega\varepsilon_0}\right)\left(1+\frac{\sigma_D(y)}{i\omega\varepsilon_0}\right)^{-1}H_y(\omega) &= c_0\frac{\partial \tilde{E_z}}{\partial x}(\omega),\\
+\label{eq:2D_TM_Dz_w_H}i\omega\left(1+\frac{\sigma_D(x)}{i\omega\varepsilon_0}\right)\left(1+\frac{\sigma_D(y)}{i\omega\varepsilon_0}\right)\tilde{D_z}(\omega) &= c_0\left(\frac{\partial H_y}{\partial x}(\omega)-\frac{\partial H_x}{\partial y}(\omega)\right),\\
+\label{eq:2D_TM_Dz_w_E}\tilde{D_z}(\omega)&=\varepsilon_r(\omega)\tilde{E_z}(\omega)+\frac{\sigma}{i\omega\varepsilon_0}\tilde{E_z}(\omega).
+\end{align}
+\end{subequations}
+\end{strip}
 
+\noindent We note again the important fact that Eq.~\ref{eq:2D_TM_Dz_w_E} is the only part of this formulation to contain information about the propgation medium. All other parts, Eqs.~\ref{eq:2D_TM_Hx_w},~\ref{eq:2D_TM_Hy_w},~and~\ref{eq:2D_TM_Dz_w_H}, only contain information about propagation in free space and the PML.
+
+Now, we transform these expressions to the time-domain, treating Eq.~\ref{eq:2D_TM_Dz_w_E} exactly as in previous discussions,
+\begin{strip}
+\begin{subequations}
+\begin{align}
+\end{align}
+\end{subequations}
+\end{strip}
 
 
 \bibliography{References}
@@ -510,7 +578,7 @@ f(t)=\int_{-\infty}^{t}g(\tau)d\tau = \int_{-\infty}^{\infty}g(\tau)H(t-\tau)d\t
 \end{equation}
 Fourier's convolution theorem states that for any two functions, $\theta(t)$ and $\varphi(t)$, whose Fourier transforms exist,
 \begin{equation}
-\mathcal{F}((\theta*\phi)(t)) = \Theta(\omega)\varPhi(\omega).
+\mathcal{F}((\theta*\varphi)(t)) = \Theta(\omega)\varPhi(\omega).
 \end{equation}
 Applying this to our function, $f(t)$, yields,
 \begin{equation}
@@ -589,4 +657,90 @@ Let $\eta=c_{n+1}$. Since $[a,c_{n+1}]\subseteq[a,c_n]\subseteq[a,c_{n-1}]\subse
 f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2 + \cdots + \frac{f^{(n)}(a)}{n!}(x-a)^n + \frac{f^{(n+1)}(\eta)}{(n+1)!}(x-a)^{n+1}.
 \end{equation}
 \end{proof}
+\newpage
+\section{Unproven Formula}
+\label{ap:Sullivan}
+In~\cite{Sullivan00}, the author implicitly states that the inverse Fourier transform of Eq.~\ref{eq:2D_TM_Dz_w_H} is
+\begin{equation}
+\label{eq:Sullivan_continuous1}
+\frac{\partial \tilde{D_z}}{\partial t} + \frac{\sigma_D(x)+\sigma_D(y)}{\varepsilon_0}\tilde{D_z} + \frac{(\Delta t)^2\sigma_D(x)\sigma_D(y)}{4\varepsilon_0^2}\frac{\partial \tilde{D_z}}{\partial t} = c_0\left(\frac{\partial H_y}{\partial x}-\frac{\partial H_x}{\partial y}\right).
+\end{equation}
+Which suggests the identity,
+\begin{equation*}
+\frac{1}{i\omega}\tilde{D_z} \rightleftharpoons \frac{(\Delta t)^2}{4} \frac{\partial \tilde{D_z}}{\partial t}.
+\end{equation*}
+Not only is this certainly wrong, it fails to even make sense, since $\Delta t$ should only appear after discretization.
+
+I provide my work below which lead me to this incorrect identity from the author's equations here. The author starts with (Eq. (3.23a) in \cite{Sullivan00})
+\begin{equation}
+\label{eq:2D_TM_Dz_w_H_app}i\omega\left(1+\frac{\sigma_D(x)}{i\omega\varepsilon_0}\right)\left(1+\frac{\sigma_D(y)}{i\omega\varepsilon_0}\right)\tilde{D_z}(\omega) &= c_0\left(\frac{\partial H_y}{\partial x}(\omega)-\frac{\partial H_x}{\partial y}(\omega)\right),
+\end{equation}
+which is the same as Eq.~\ref{eq:2D_TM_Dz_w_H} used in this work. Using the following definitions (Eq. 3.15  in \cite{Sullivan00})
+\begin{subequations}
+\begin{align}
+\label{eq:g2}gi2(i) = \frac{1}{1+\sigma_D(i)\frac{\Delta t}{2\varepsilon_0}},\\
+\label{eq:g3}gi3(i) = \frac{1-\sigma_D(i)\frac{\Delta t}{2\varepsilon_0}}{1+\sigma_D(i)\frac{\Delta t}{2\varepsilon_0}},
+\end{align}
+\end{subequations}
+where $i$ is the discretized spatial coordinate, $x_i = i\Delta x$ and $y_j = j\Delta y$, the author claims that the discrete form of Eq.~\ref{eq:2D_TM_Dz_w_H_app} in the time-domain is (rewritten in the notation used in this work)
+\begin{equation}
+\label{eq:Sullivan_Dz}
+\begin{split}
+\tilde{D_z}(x_i,y_j,t_k) &= gi3(x_i)gj3(y_j)\tilde{D_z}(x_i,y_j,t_{k-1})\\
+ &+ \frac{gi2(x_i)gj2(y_j)}{2}\left[H_y(x_i,y_j,t_k)-H(x_{i-1},y_j,t_k)\right.\\
+&\left.-H_x(x_i,y_j,t_k)+H_x(x_i,y_{j-1},t_k)\right].
+\end{split}
+\end{equation}
+We will work backwards to un-discretize this equation to see if this is indeed the inverse Fourier transform of Eq.~\ref{eq:2D_TM_Dz_w_H_app}. Substituting Eqs.~\ref{eq:deltat},~\ref{eq:g2},~and~\ref{eq:g3} and assuming $\Delta x = \Delta y$ yields,
+\begin{equation}
+\begin{split}
+\tilde{D_z}(x_i,y_j,t_k) &= \left(\frac{1-\sigma_D(x_i)\frac{\Delta t}{2\varepsilon_0}}{1+\sigma_D(x_i)\frac{\Delta t}{2\varepsilon_0}}\right)\left(\frac{1-\sigma_D(y_j)\frac{\Delta t}{2\varepsilon_0}}{1+\sigma_D(y_j)\frac{\Delta t}{2\varepsilon_0}}\right)\tilde{D_z}(x_i,y_j,t_{k-1})\\
+ &+ \left(1+\sigma_D(x_i)\frac{\Delta t}{2\varepsilon_0}\right)^{-1}\left(1+\sigma_D(y_j)\frac{\Delta t}{2\varepsilon_0}\right)^{-1}\frac{\Delta t}{\Delta x}c_0\left[H_y(x_i,y_j,t_k)\right. \\
+&\left.-H(x_{i-1},y_j,t_k)-H_x(x_i,y_j,t_k)+H_x(x_i,y_{j-1},t_k)\right].
+\end{split}
+\end{equation}
+The final bracketed term, over $\Delta x$, is clearly just the finite differences of $\partial H_y/\partial x$ and $\partial H_x/\partial y$ (with the assumption that $\Delta x = \Delta y$). Knowing this, multiplying both sides by $\frac{1}{\Delta t}\left(1+\sigma_D(x_i)\frac{\Delta t}{2\varepsilon_0}\right)\left(1+\sigma_D(y_j)\frac{\Delta t}{2\varepsilon_0}\right)$, and subtracting the $\tilde{D_z}(x_i,y_j,t_{k-1})$ term to the left side gives
+\begin{equation}
+\label{eq:substituted}
+\begin{split}
+&\frac{1}{\Delta t}\left[\left(1+\sigma_D(x_i)\frac{\Delta t}{2\varepsilon_0}\right)\left(1+\sigma_D(y_j)\frac{\Delta t}{2\varepsilon_0}\right)\tilde{D_z}(x_i,y_j,t_k)\right. \\
+&\left.- \left(1-\sigma_D(x_i)\frac{\Delta t}{2\varepsilon_0}\right)\left(1-\sigma_D(y_j)\frac{\Delta t}{2\varepsilon_0}\right)\tilde{D_z}(x_i,y_j,t_{k-1})\right]\\
+& = c_0\left(\frac{\partial H_y}{\partial x}-\frac{\partial H_x}{\partial y}\right).
+\end{split}
+\end{equation}
+And so the right side of Eq.~\ref{eq:2D_TM_Dz_w_H_app} is recovered (since $\frac{\partial H_y}{\partial x}(\omega) \rightleftharpoons \frac{\partial H_y}{\partial x}(t)$ and likewise for $H_x$). So we work only with the left side of Eq.~\ref{eq:substituted} now, which we expect to be the inverse Fourier transform of the left side of Eq.~\ref{eq:2D_TM_Dz_w_H_app}. Fully expanding the left side shows
+\begin{align*}
+&\begin{aligned}
+\rightarrow\frac{1}{\Delta t}&\left[\left(1+\frac{\Delta t}{2\varepsilon_0}\left(\sigma_D(x_i)+\sigma_D(y_j)\right)+\frac{\left(\Delta t\right)^2}{4\varepsilon_0^2}\sigma_D(x_i)\sigma_D(y_j)\right)\tilde{D_z}(x_i,y_j,t_k)\right.\\
+&\left.-\left(1-\frac{\Delta t}{2\varepsilon_0}\left(\sigma_D(x_i)+\sigma_D(y_j)\right)+\frac{\left(\Delta t\right)^2}{4\varepsilon_0^2}\sigma_D(x_i)\sigma_D(y_j)\right)\tilde{D_z}(x_i,y_j,t_{k-1})\right],
+\end{aligned}\\
+&\begin{aligned}
+\rightarrow \frac{\tilde{D_z}(x_i,y_j,t_k)-\tilde{D_z}(x_i,y_j,t_{k-1})}{\Delta t} &+ \frac{\sigma_D(x_i)+\sigma_D(y_j)}{\varepsilon_0}\frac{\tilde{D_z}(x_i,y_j,t_k)+\tilde{D_z}(x_i,y_j,t_{k-1})}{2}\\
+& + \frac{\Delta t \sigma_D(x_i)\sigma_D(y_j)}{4\varepsilon_0^2}\left(\tilde{D_z}(x_i,y_j,t_k)-\tilde{D_z}(x_i,y_j,t_{k-1})\right).
+\end{aligned}
+\end{align*}
+We will use the same fact the author uses,
+\begin{equation}
+\frac{\tilde{D_z}(x_i,y_j,t_k)+\tilde{D_z}(x_i,y_j,t_{k-1})}{2} = \tilde{D_z}(x_i,y_j,t_{k-1/2}) = \tilde{D_z}(t),
+\end{equation}
+meaning that $\tilde{D_z}(t)$ should be the average of the timesteps immediately before and after it. We will also use the definition of the central difference approximation, just as before, to arrive at an expression for this left side in continuous form
+\begin{equation}
+\label{eq:Sullivan_continuous2}
+\rightarrow \frac{\partial\tilde{D_z}}{\partial t} + \frac{\sigma_D(x)+\sigma_D(y)}{\varepsilon_0}\tilde{D_z}(t) +\frac{\sigma_D(x)\sigma_D(y)\left(\Delta t\right)^2}{4\varepsilon_0^2}\frac{\partial \tilde{D_z}}{\partial t}.
+\end{equation}
+Which is the left side of Eq.~\ref{eq:Sullivan_continuous1} as claimed. Already this must be incorrect, since we have a $\Delta t$ in a function which is supposed to be continuous. However, now we take the Fourier transform of this and compare it to the left side of Eq.~\ref{eq:2D_TM_Dz_w_H_app}. Using the identity proven in Appendix~\ref{ap:fourier2}, we see that the Fourier transform of Eq.~\ref{eq:Sullivan_continuous2} is
+\begin{equation}
+\label{eq:Sullivan_continuous_w1}
+i\omega\tilde{D_z}(\omega)+\frac{\sigma_D(x)+\sigma_D(y)}{\varepsilon_0}\tilde{D_z}(\omega) + \frac{\sigma_D(x)\sigma_D(y)\left(\Delta t\right)^2}{4\varepsilon_0^2}i\omega\tilde{D_z}(t).
+\end{equation}
+To compare it to the left side of Eq.~\ref{eq:2D_TM_Dz_w_H_app}, we expand Eq.~\ref{eq:2D_TM_Dz_w_H_app},
+\begin{equation}
+\label{eq:Sullivan_continuous_w2}
+\rightarrow i\omega\tilde{D_z}(\omega)+\frac{\sigma_D(x)+\sigma_D(y)}{\varepsilon_0}\tilde{D_z}(\omega)+\frac{\sigma_D(x)\sigma_D(y)}{i\omega\varepsilon_0^2}\tilde{D_z}(\omega).
+\end{equation}
+If the author's transformation is correct and the above un-discretization and Fourier transform is correct, then Eqs.~\ref{eq:Sullivan_continuous_w1}~and~\ref{eq:Sullivan_continuous_w2} should be equivalent. Which suggests,
+\begin{equation}
+\Delta t = \frac{2}{i\omega}.
+\end{equation}
+Clearly, something is wrong here. I cannot make sense of it, and not for lack of trying.
 \end{document}
