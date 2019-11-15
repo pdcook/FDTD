@@ -105,8 +105,8 @@ def FDTD2D(media,pulse,Nt,PMLSize = 5):
         Hy[ti]  = fx3*Hy[ti-1] + 0.5*fx2*dxE + fy1*Ihy[ti]
 
         dyE     = np.roll(Ez[ti],1,axis=0) - Ez[ti]
-        Ihx[ti] = Ihx[ti-1] - dyE
-        Hx[ti]  = fy3*Hx[ti-1] - 0.5*fy2*dyE + fx1*Ihx[ti]
+        Ihx[ti] = Ihx[ti-1] + dyE
+        Hx[ti]  = fy3*Hx[ti-1] - 0.5*fy2*dyE - fx1*Ihx[ti]
 
     # return arrays
     return Ez, Dz, Hx, Hy
