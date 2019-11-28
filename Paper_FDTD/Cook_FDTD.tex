@@ -181,15 +181,10 @@ For example purposes, a formulation of the FDTD method in one dimension is prese
 We will interleave $H_y$ and $\tilde{D_x}$ both spatially and temporally. This is one of the fundamental features of the FDTD method~\cite{Sullivan00}. To interleave the two fields, we evaluate them---as well as their derivatives---offset from one another by $\Delta z/2$ in space and $\Delta t/2$ in time,
 \end{multicols}
 \begin{subequations}
-\begin{equation}
-\label{eq:offset_dD_dt}\frac{\partial \tilde{D_x}}{\partial t}(z, t) = -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\partial H_y}{\partial z}(z, t)
-\end{equation}
-\vspace{-65pt}
-%\begin{strip}
-\begin{equation}
-\label{eq:offset_dH_dt}\frac{\partial H_y}{\partial t}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right) = -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right)
-\end{equation}
-%\end{strip}
+\begin{align}
+\label{eq:offset_dD_dt}\frac{\partial \tilde{D_x}}{\partial t}(z, t) &= -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\partial H_y}{\partial z}(z, t)\\
+\label{eq:offset_dH_dt}\frac{\partial H_y}{\partial t}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right) &= -\frac{1}{\sqrt{\varepsilon_0\mu_0}}\frac{\partial \tilde{E_x}}{\partial z}\left(z+\frac{\Delta z}{2},t+\frac{\Delta t}{2}\right)
+\end{align}
 \end{subequations}
 \begin{subequations}
 %\begin{strip}
