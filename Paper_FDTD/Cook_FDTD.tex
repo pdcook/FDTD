@@ -1228,11 +1228,12 @@ def Energy(Ez,Hx,Hy):
 
 ###############################################################################
 
-media = Media(200,200,0.1)
-pulse = Pulse(media, (0*media.dx,-25*media.dx), \
-             10*media.dx, 10*media.dx, 10*media.dt, 2*media.dt)
-Ez, Dz, Hx, Hy = FDTD2D(media, pulse, 500, PMLSize = 10)
-E = Energy(Ez,Hx,Hy)
-Animate(Ez,"Electric Field, $\\tilde{E}_z(x,y)$")
+if __name__ == "__main__":
+    media = Media(200,200,0.1)
+    pulse = Pulse(media, (0*media.dx,-25*media.dx), \
+                 10*media.dx, 10*media.dx, 10*media.dt, 2*media.dt)
+    Ez, Dz, Hx, Hy = FDTD2D(media, pulse, 500, PMLSize = 10)
+    E = Energy(Ez,Hx,Hy)
+    Animate(Ez,"Electric Field, $\\tilde{E}_z(x,y)$")
 \end{minted}
 \end{document}
