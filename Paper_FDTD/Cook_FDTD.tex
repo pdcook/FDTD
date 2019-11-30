@@ -120,8 +120,8 @@ So that the relevant equations for electromagnetic waves are then
 Finally, we express everything in Gaussian units instead of SI\@. The purpose for this is so that $E$, $D$, and $H$ are around the same order of magnitude~\cite{Sullivan00}. In Gaussian units,
 \begin{subequations}
 \begin{align}
-\mathbf{\tilde{E}}=\sqrt{\frac{\varepsilon_0}{\mu_0}}\mathbf{E},\\
-\mathbf{\tilde{D}}=\sqrt{\frac{1}{\varepsilon_0\mu_0}}\mathbf{D}.
+\mathbf{\tilde{E}}&=\sqrt{\frac{\varepsilon_0}{\mu_0}}\mathbf{E},\\
+\mathbf{\tilde{D}}&=\sqrt{\frac{1}{\varepsilon_0\mu_0}}\mathbf{D}.
 \end{align}
 \end{subequations}
 This normalization yields the final set of equations that will be used to govern the propagation of electromagnetic waves in a lossy dielectric medium,
@@ -569,13 +569,13 @@ G_{bz}(x_i,y_j) = \frac{\sigma(x_i,y_j)\Delta t}{\varepsilon_0}.
 \label{eq:2D_FDTD_PML}
 \begin{empheq}[box=\fbox]{align}
 &\begin{aligned}
-\tilde{D_z}(x_i,y_i,t_k)&=g_{x3}(x_i)g_{y3}(y_j)\tilde{D_z}(x_i,y_j,t_{k-1})\\&+\frac{g_{x2}(x_i)g_{y2}(y_j)}{2}\left[H_y(x_i,y_i,t_k)-H_y(x_{i-1},y_i,t_k)\right.\\&\left.-H_x(x_i,y_j,t_k)+H_x(x_i,y_{j-1},t_k)\right],
+\tilde{D_z}(x_i,y_i,t_k)&=g_{x3}(x_i)g_{y3}(y_j)\tilde{D_z}(x_i,y_j,t_{k-1})\\&+\frac{g_{x2}(x_i)g_{y2}(y_j)}{2}\left[H_y(x_i,y_i,t_k)-H_y(x_{i-1},y_i,t_k)\right.\\&\left.-H_x(x_i,y_j,t_k)+H_x(x_i,y_{j-1},t_k)\right]
 \end{aligned}\\
 &\begin{aligned}
-\tilde{E_z}(x_i,y_i,t_k)&=G_{az}(x_i,y_j)\left(\tilde{D_z}(x_i,y_j,t_k)-I_z(x_i,y_j,t_{k-1})\right),
+\tilde{E_z}(x_i,y_i,t_k)&=G_{az}(x_i,y_j)\left(\tilde{D_z}(x_i,y_j,t_k)-I_z(x_i,y_j,t_{k-1})\right)
 \end{aligned}\\
 &\begin{aligned}
-I_z(x_i,y_i,t_k)&=I_z(x_i,y_j,t_{k-1})+G_{bz}(x_i,y_j)\tilde{E_z},
+I_z(x_i,y_i,t_k)&=I_z(x_i,y_j,t_{k-1})+G_{bz}(x_i,y_j)\tilde{E_z}
 \end{aligned}\\
 &\begin{aligned}
 I_{H_x}(x_i,y_i,t_k)&=I_{H_x}(x_i,y_j,t_{k-1})+\partial_y\tilde{E_z}(x_i,y_j,t_k)
